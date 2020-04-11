@@ -40,7 +40,11 @@ public class AfkCommand implements CommandExecutor {
 				};
 
 				this.plugin.getServer().getScheduler().runTask(this.plugin, afkEventTask);
+			} else {
+				this.plugin.getServer().getLogger().log(Level.WARNING, "You must be a Player to use this command!");
 			}
+			
+			return true;
 		}
 
 		if (args.length > 2) {

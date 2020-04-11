@@ -4,6 +4,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import tws.management.afk.AfkEventListener;
 import tws.management.commands.AfkCommand;
+import tws.management.commands.tabcompleters.AfkTabCompleter;
 import tws.management.configuration.AfkConfigModel;
 import tws.management.configuration.ConfigModel;
 import tws.management.configuration.ConfigurationManager;
@@ -41,6 +42,7 @@ public class ManagementPlugin extends JavaPlugin {
 		this.getServer().getPluginManager().registerEvents(new AfkEventListener(this, afkConfig), this);
 		
 		this.getCommand("afk").setExecutor(new AfkCommand(this, this.afkDatabase, new MojangApi()));
+		this.getCommand("afk").setTabCompleter(new AfkTabCompleter(this));
 	}
 	
 	@Override
