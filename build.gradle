@@ -64,6 +64,8 @@ dependencies {
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
     
+    compileOnly files('lib/TABv2.7.3.jar')
+    
     // Pick only one of these and read the comment in the repositories block.
   	compileOnly 'org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT' // The Spigot API with no shadowing. Requires the OSS repo.
   	//compileOnly 'org.bukkit:bukkit:1.14.4-R0.1-SNAPSHOT' // The Bukkit API with no shadowing.

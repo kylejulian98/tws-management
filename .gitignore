@@ -101,3 +101,4 @@ gradle.properties
 gradlew
 gradlew.bat
 gradle/
+lib/
