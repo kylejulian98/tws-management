@@ -58,7 +58,7 @@ public class AfkManager extends BukkitRunnable {
 		int afkTime = this.afkConfig.getTimeMinutes();
 		int afkKickTime = this.afkConfig.getKickTimeMinutes();
 		
-		Player player = this.plugin.getServer().getPlayer(playerId);
+		Player player = this.plugin.getServer().getPlayer(this.playerId);
 		if (player == null) { // Player does not exist? Should not be possible since this Runnable would be cancelled
 			return;
 		}
@@ -66,7 +66,8 @@ public class AfkManager extends BukkitRunnable {
 		this.addPlayerAfkMinutes(1);
 		
 		if (!this.alreadyAfk && this.getPlayerAfkMinutes() == afkTime) { // Player is AFK
-			AfkEvent event = new AfkEvent(playerId);
+			AfkEvent event = new AfkEvent(this.playerId);
+			
 			this.plugin.getServer().getScheduler().runTask(this.plugin, () -> {
 				player.sendMessage(ChatColor.DARK_RED + "You are now AFK");
 				this.plugin.getServer().getPluginManager().callEvent(event);

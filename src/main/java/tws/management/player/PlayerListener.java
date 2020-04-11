@@ -3,6 +3,7 @@ package tws.management.player;
 import java.util.HashMap;
 import java.util.UUID;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,10 +15,12 @@ import org.bukkit.scheduler.BukkitTask;
 import tws.management.afk.AfkManager;
 import tws.management.afk.events.AfkCancelledEvent;
 import tws.management.afk.events.AfkCommandEvent;
+import tws.management.afk.events.AfkEvent;
 import tws.management.configuration.AfkConfigModel;
 import tws.management.configuration.ConfigModel;
 import tws.management.configuration.ConfigurationManager;
 import tws.management.data.AfkDatabaseManager;
+import tws.management.extensions.TabPluginHelper;
 
 public class PlayerListener implements Listener {
 
@@ -61,12 +64,17 @@ public class PlayerListener implements Listener {
 			afkTimerTask.cancel();
 		}
 		
+		Runnable tabTask = () -> {
+			TabPluginHelper.setTabSuffix(this.plugin, playerId, ChatColor.RESET + "");
+		};
+		this.plugin.getServer().getScheduler().runTask(this.plugin, tabTask);
+		
 		afkTimerTask = this.createAndStartAfkManagerTask(playerId);
 		this.playerAfkManagerTasks.put(playerId, afkTimerTask);
 	}
 	
 	@EventHandler
-	public void onAfk(AfkCommandEvent e) {
+	public void onAfkCommand(AfkCommandEvent e) {
 		UUID playerId = e.getPlayerId();
 		BukkitTask afkTimerTask = this.playerAfkManagerTasks.getOrDefault(playerId, null);
 		
@@ -76,6 +84,23 @@ public class PlayerListener implements Listener {
 		
 		afkTimerTask = this.createAndStartAfkManagerTask(playerId, true); // Player triggered this AFK event, they are already AFK
 		this.playerAfkManagerTasks.put(playerId, afkTimerTask);
+		
+		// Raise new AFK Event, as the AFKManager will not raise another due to the alreadyAfk being set to true property
+		AfkEvent event = new AfkEvent(playerId);
+		Runnable afkEventTask = () -> {
+			this.plugin.getServer().getPluginManager().callEvent(event);
+		};
+		this.plugin.getServer().getScheduler().runTask(this.plugin, afkEventTask); // Cannot raise a new event asynchronously
+	}
+	
+	@EventHandler
+	public void onAfk(AfkEvent e) {
+		UUID playerId = e.getPlayerId();
+		
+		Runnable tabTask = () -> {
+			TabPluginHelper.setTabSuffix(this.plugin, playerId, ChatColor.GRAY + "[" + ChatColor.RED + "AFK" + ChatColor.GRAY + "] " + ChatColor.RESET);
+		};
+		this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, tabTask);
 	}
 	
 	private BukkitTask createAndStartAfkManagerTask(UUID playerId) {
