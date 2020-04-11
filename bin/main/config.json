@@ -1,0 +1,33 @@
+{
+	"afkConfig": {
+		"timeMinutes": 1,
+		"kickTimeMinutes": 2,
+		"kickMessage": "You have been kicked for being AFK for too long!",
+		"events": [
+			"onPlayerChat",
+			"onPlayerInteractEntity",
+			"onPlayerInteract",
+			"onPlayerBedEnter",
+			"onPlayerChangedWorld",
+			"onPlayerEditBook",
+			"onPlayerDropItem",
+			"onPlayerItemBreak",
+			"onPlayerShearEntity",
+			"onPlayerToggleFlight",
+			"onPlayerToggleSprint",
+			"onPlayerToggleSneak",
+			"onPlayerUnleashEntity",
+			"onPlayerBucketFill",
+			"onPlayerBucketEmpty",
+			"onPlayerMove",
+			"onPlayerExpChange"
+		]
+	},
+	"databaseConfig": {
+		"host": "localhost",
+		"database": "local-postgres",
+		"userName": "postgres",
+		"password": "mysecretpassword",
+		"port": 5432
+	}
+}
