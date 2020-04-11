@@ -43,7 +43,7 @@ public class AfkCommand implements CommandExecutor {
 			} else {
 				this.plugin.getServer().getLogger().log(Level.WARNING, "You must be a Player to use this command!");
 			}
-			
+
 			return true;
 		}
 
