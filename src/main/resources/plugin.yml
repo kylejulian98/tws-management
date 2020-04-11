@@ -4,6 +4,7 @@ author: KyleJ
 version: 0.0.1
 api-version: 1.15
 database: true
+softdepend: [TAB]
 commands:
   afk:
     description: To go afk. Specify the exempt keyword and a Player name to prevent them from being kicked for inactivity.
