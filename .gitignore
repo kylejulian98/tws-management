@@ -96,3 +96,8 @@ local.properties
 .project
 
 .classpath
+
+gradle.properties
+gradlew
+gradlew.bat
+gradle/
