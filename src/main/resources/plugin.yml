@@ -1,8 +1,8 @@
-name: tws.management
+name: tws-management
 main: tws.management.ManagementPlugin
 author: KyleJ
 version: 0.0.1
-api-version: 1.14
+api-version: 1.15
 database: true
 commands:
   afk:
@@ -12,3 +12,10 @@ commands:
       Example: /<command>
       Example: /<command> exempt add Player1
       Example: /<command> exempt remove Player1
+permissions:
+  tws.*:
+    description: Gives access to all commands from the TWS plugin.
+    children:
+      tws.afk.exempt: true
+  tws.afk.exempt:
+    description: Gives access to add and remove players to the inactivity kick exempt list.
