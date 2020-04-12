@@ -31,6 +31,7 @@ public class AfkTabCompleter implements TabCompleter {
         if (args.length == 2) {
             autoCompleteList.add("add");
             autoCompleteList.add("remove");
+            autoCompleteList.add("list");
             return autoCompleteList;
         }
 

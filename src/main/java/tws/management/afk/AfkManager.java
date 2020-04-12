@@ -10,7 +10,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import tws.management.afk.events.AfkEvent;
 import tws.management.configuration.AfkConfigModel;
 import tws.management.data.AfkDatabaseManager;
-import tws.management.data.QueryCallback;
+import tws.management.data.callbacks.BooleanQueryCallback;
 
 /**
  * 
@@ -74,15 +74,16 @@ public class AfkManager extends BukkitRunnable {
 			});
 		}
 		
-		QueryCallback callback = new QueryCallback() {
+		BooleanQueryCallback callback = new BooleanQueryCallback() {
 			@Override
-			public void onQueryComplete(boolean result) {
+			public void onQueryComplete(Boolean result) {
 				if (!result) { // Player is not Kick exempt
-					if (canKickPlayer(player, afkKickTime, afkTime))
+					if (canKickPlayer(player, afkKickTime, afkTime)) {
 						player.kickPlayer(afkConfig.getKickMessage());
 					}
 				}
-			};
+			}
+		};
 		
 		this.afkDatabase.isPlayerKickExempt(playerId, callback);
 	}
