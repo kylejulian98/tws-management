@@ -89,8 +89,13 @@ public class AfkManager extends BukkitRunnable {
 	}
 	
 	private boolean canKickPlayer(Player player, int afkKickTime, int afkTime) {
-		if (this.getPlayerAfkMinutes() > (afkKickTime + afkTime)) { // Player has to be inactive for both the AFK time and AFK Kick time
-			return true;
+		if (this.getPlayerAfkMinutes() >= (afkKickTime + afkTime)) { // Player has to be inactive for both the AFK time and AFK Kick time
+			int numberOfPlayersOnline = this.plugin.getServer().getOnlinePlayers().size(); 
+			int numberOfRequiredPlayersToKick = this.afkConfig.getPlayerCountNeededForKick();
+			
+			if (numberOfPlayersOnline >= numberOfRequiredPlayersToKick) {
+				return true;
+			}
 		}
 		
 		return false;
