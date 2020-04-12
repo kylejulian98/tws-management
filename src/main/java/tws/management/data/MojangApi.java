@@ -21,4 +21,20 @@ public class MojangApi {
 
 		return user.getId();
 	}
+	
+	public String getPlayerName(UUID playerId) throws Exception {
+        String playerIdString = playerId.toString();
+
+        String url = "https://api.mojang.com/user/profiles/" + playerIdString.replace("-", "") + "/names";
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+        
+		ObjectMapper mapper = new ObjectMapper();
+		MojangUserNameModel[] userNames = mapper.readValue(con.getInputStream(), MojangUserNameModel[].class);
+		
+		int numberOfNames = userNames.length;
+		MojangUserNameModel lastNameChanged = userNames[numberOfNames - 1];
+		
+		return lastNameChanged.getName();
+	}
 }

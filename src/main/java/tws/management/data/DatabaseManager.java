@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
+import tws.management.data.callbacks.BooleanQueryCallback;
+
 public abstract class DatabaseManager {
 
 	private final DatabaseConnectionManager databaseConnectionManager;
@@ -19,9 +21,9 @@ public abstract class DatabaseManager {
 	/**
 	 * Setups the Default Database schema for the Database Manager
 	 * 
-	 * @param callback The result of the Query as a {@link QueryCallback}
+	 * @param callback The result of the Query as a {@link BooleanQueryCallback}
 	 */
-	public abstract void setupDefaultSchema(final QueryCallback callback);
+	public abstract void setupDefaultSchema(final BooleanQueryCallback callback);
 
 	protected JavaPlugin getPlugin() {
 		return this.plugin;

@@ -9,7 +9,7 @@ commands:
   afk:
     description: To go afk. Specify the exempt keyword and a Player name to prevent them from being kicked for inactivity.
     usage: |
-      /<command> [exempt [add|remove] [player]]
+      /<command> [exempt [add|remove|list] [player]]
       Example: /<command>
       Example: /<command> exempt add Player1
       Example: /<command> exempt remove Player1
