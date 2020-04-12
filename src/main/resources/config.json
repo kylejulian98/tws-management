@@ -3,6 +3,7 @@
 		"timeMinutes": 1,
 		"kickTimeMinutes": 2,
 		"kickMessage": "You have been kicked for being AFK for too long!",
+		"playerCountNeededForKick": 1,
 		"events": [
 			"onPlayerChat",
 			"onPlayerInteractEntity",
