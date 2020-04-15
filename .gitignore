@@ -98,5 +98,4 @@ local.properties
 .classpath
 
 gradle.properties
-lib/
 .gradle/

@@ -22,11 +22,5 @@ jobs:
         java-version: 1.8
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    - name: Download file dependencies
-      run: |
-        mkdir lib
-        cd lib
-        wget https://www.spigotmc.org/resources/tab-1-5-x-1-15-x-free-version.57806/download?version=323285 -O TABv2.7.3.jar
-        cd ..
     - name: Build with Gradle
       run: ./gradlew build
