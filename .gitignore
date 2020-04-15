@@ -98,7 +98,4 @@ local.properties
 .classpath
 
 gradle.properties
-gradlew
-gradlew.bat
-gradle/
-lib/
+.gradle/
