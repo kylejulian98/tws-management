@@ -1,5 +1,5 @@
 name: tws-management
-main: tws.management.ManagementPlugin
+main: dev.kylejulian.management.ManagementPlugin
 author: KyleJ
 version: 0.0.1
 api-version: 1.15
