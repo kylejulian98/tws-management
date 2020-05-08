@@ -47,6 +47,6 @@ public class ManagementPlugin extends JavaPlugin {
 	
 	@Override
 	public void onDisable() {
-		
+		this.databaseConnectionManager.closeConnections();
 	}
 }

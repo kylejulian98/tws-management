@@ -67,7 +67,7 @@ public class AfkCommand implements CommandExecutor {
 						String target;
 						if (args.length == 3) {
 							target = args[2];
-							playerId = this.getPlayerIdFromMojangApi(target);
+							playerId = this.getPlayerId(target);
 						} else {
 							return false;
 						}
@@ -96,7 +96,7 @@ public class AfkCommand implements CommandExecutor {
 						String target;
 						if (args.length == 3) {
 							target = args[2];
-							playerId = this.getPlayerIdFromMojangApi(target);
+							playerId = this.getPlayerId(target);
 						} else {
 							return false;
 						}
@@ -189,7 +189,7 @@ public class AfkCommand implements CommandExecutor {
 			
 			// If player is not online, fetch it from the Mojang API
 			if (player == null) {
-				playerName = this.getNameFromMojangApi(id);
+				playerName = this.getName(id);
 			}
 			else {
 				playerName = player.getDisplayName();
@@ -210,7 +210,6 @@ public class AfkCommand implements CommandExecutor {
 			baseMessage.event(previousPageHoverEvent).event(new ClickEvent(Action.RUN_COMMAND, "/afk exempt list " + prevPage));
 			baseMessage.append("").reset(); // Fix to prevent the rest of the baseMessage being associated to this event.
 		}
-		
 
 		baseMessage.append(ChatColor.YELLOW + " Page (" + ChatColor.GREEN + pageIndex + "/" + maxPages + ChatColor.YELLOW + ") " + ChatColor.RESET)
 				.append(ChatColor.RED + "-->" + ChatColor.RESET);
@@ -225,7 +224,12 @@ public class AfkCommand implements CommandExecutor {
 		return baseMessage;
 	}
 
-	private UUID getPlayerIdFromMojangApi(String name) {
+	/***
+	 * Get a Player Id from the Mojang Api based on a username
+	 * @param name
+	 * @return Player Id or null
+	 */
+	private UUID getPlayerId(String name) {
 		UUID playerId = null;
 
 		try {
@@ -237,8 +241,13 @@ public class AfkCommand implements CommandExecutor {
 
 		return playerId;
 	}
-	
-	private String getNameFromMojangApi(UUID playerId) {
+
+	/***
+	 * Get a Player Username from the Mojang Api based on a Player Id
+	 * @param playerId
+	 * @return Username or null
+	 */
+	private String getName(UUID playerId) {
 		String playerName = null;
 
 		try {

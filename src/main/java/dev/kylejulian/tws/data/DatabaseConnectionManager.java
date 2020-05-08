@@ -4,6 +4,8 @@ import org.apache.commons.dbcp2.BasicDataSource;
 
 import dev.kylejulian.tws.configuration.DatabaseConfigModel;
 
+import java.sql.SQLException;
+
 public class DatabaseConnectionManager {
 
 	private final BasicDataSource connectionPool;
@@ -20,5 +22,16 @@ public class DatabaseConnectionManager {
 	
 	public BasicDataSource getConnectionPool() {
 		return this.connectionPool;
+	}
+
+	/***
+	 * Closes and releases all idle database connections
+	 */
+	public void closeConnections() {
+		try {
+			this.connectionPool.close();
+		} catch (SQLException exception) {
+			exception.printStackTrace();
+		}
 	}
 }
