@@ -22,7 +22,7 @@ public class AfkDatabaseManager extends DatabaseManager {
 
 	@Override
 	public void setupDefaultSchema(final BooleanQueryCallback callback) {
-		final String sqlCommand = "CREATE TABLE IF NOT EXISTS afk_kick_exempt (id SERIAL PRIMARY KEY NOT NULL, player_id UUID NOT NULL)";
+		final String sqlCommand = "CREATE TABLE IF NOT EXISTS afk_kick_exempt (id INTEGER PRIMARY KEY NOT NULL, player_uuid UUID NOT NULL)";
 
 		Runnable task = () -> {
 			boolean result = false;
@@ -51,7 +51,7 @@ public class AfkDatabaseManager extends DatabaseManager {
 	 * @param playerId Player to remove from the Exempt list
 	 */
 	public void addPlayerToKickExempt(final UUID playerId, final BooleanQueryCallback callback) {
-		final String sqlCommand = "INSERT INTO afk_kick_exempt (player_id) VALUES (?)";
+		final String sqlCommand = "INSERT INTO afk_kick_exempt (player_uuid) VALUES (?)";
 
 		Runnable task = () -> {
 			boolean result = false;
@@ -81,7 +81,7 @@ public class AfkDatabaseManager extends DatabaseManager {
 	 * @param playerId Player to remove from the Exempt list
 	 */
 	public void removePlayerFromKickExempt(final UUID playerId, final BooleanQueryCallback callback) {
-		final String sqlCommand = "DELETE FROM afk_kick_exempt WHERE player_id = ?";
+		final String sqlCommand = "DELETE FROM afk_kick_exempt WHERE player_uuid = ?";
 
 		Runnable task = () -> {
 			boolean result = false;
@@ -111,7 +111,7 @@ public class AfkDatabaseManager extends DatabaseManager {
 	 * @param callback The result of the Query as a {@link BooleanQueryCallback}
 	 */
 	public void isPlayerKickExempt(final UUID playerId, final BooleanQueryCallback callback) {
-		final String sqlCommand = "SELECT id FROM afk_kick_exempt WHERE player_id=?";
+		final String sqlCommand = "SELECT id FROM afk_kick_exempt WHERE player_uuid=?";
 
 		Runnable task = () -> {
 			boolean result = false;
@@ -177,7 +177,7 @@ public class AfkDatabaseManager extends DatabaseManager {
 				set = statement.executeQuery();
 				
 				while (set.next()) {
-					String rowPlayerId = set.getString("player_id");
+					String rowPlayerId = set.getString("player_uuid");
 					UUID playerId = UUID.fromString(rowPlayerId);
 					playerIds.add(playerId);
 				}
@@ -230,18 +230,14 @@ public class AfkDatabaseManager extends DatabaseManager {
 
 	private void queueCallbackTaskSync(final BooleanQueryCallback callback, boolean result) {
 		final boolean callbackResult = result;
-		Runnable callbackTask = () -> {
-			callback.onQueryComplete(callbackResult);
-		};
+		Runnable callbackTask = () -> callback.onQueryComplete(callbackResult);
 
 		this.executeQuerySync(callbackTask);
 	}
 	
 	private void queueCallbackTaskSync(final AfkKickExemptListQueryCallback callback, AfkKickExemptList result) {
 		final AfkKickExemptList callbackResult = result;
-		Runnable callbackTask = () -> {
-			callback.onQueryComplete(callbackResult);
-		};
+		Runnable callbackTask = () -> callback.onQueryComplete(callbackResult);
 
 		this.executeQuerySync(callbackTask);
 	}

@@ -10,8 +10,8 @@ public class DatabaseConnectionManager {
 
 	public DatabaseConnectionManager(DatabaseConfigModel databaseConfig) {
 		this.connectionPool = new BasicDataSource();
-		this.connectionPool.setDriverClassName("org.postgresql.Driver");
-		this.connectionPool.setUrl("jdbc:postgresql://" + databaseConfig.getHost() + ":" + databaseConfig.getPort() + "/" + databaseConfig.getDatabase());
+		this.connectionPool.setDriverClassName("org.sqlite.JDBC");
+		this.connectionPool.setUrl("jdbc:sqlite:" + databaseConfig.getDirectory() + "\\" + databaseConfig.getDatabase());
 		this.connectionPool.setUsername(databaseConfig.getUserName());
 		this.connectionPool.setPassword(databaseConfig.getPassword());
 		this.connectionPool.setInitialSize(1);

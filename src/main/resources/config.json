@@ -25,11 +25,10 @@
 		]
 	},
 	"databaseConfig": {
-		"host": "localhost",
-		"database": "local-postgres",
-		"userName": "postgres",
+		"database": "tws-local.db",
+		"directory": "D:\\Games\\Minecraft\\Server\\plugins\\tws.management",
+		"userName": "twsadmin",
 		"password": "mysecretpassword",
-		"port": 5432,
 		"maxConcurrentConnections": 5
 	}
 }
