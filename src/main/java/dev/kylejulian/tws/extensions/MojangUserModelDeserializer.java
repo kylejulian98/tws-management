@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import dev.kylejulian.tws.data.MojangUserModel;
+import dev.kylejulian.tws.data.entities.MojangUserModel;
 
 public class MojangUserModelDeserializer extends JsonDeserializer<MojangUserModel> {
 

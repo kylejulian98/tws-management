@@ -3,6 +3,7 @@ package dev.kylejulian.tws.player;
 import java.util.HashMap;
 import java.util.UUID;
 
+import dev.kylejulian.tws.data.interfaces.IAfkDatabaseManager;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,17 +20,16 @@ import dev.kylejulian.tws.afk.events.AfkEvent;
 import dev.kylejulian.tws.configuration.AfkConfigModel;
 import dev.kylejulian.tws.configuration.ConfigModel;
 import dev.kylejulian.tws.configuration.ConfigurationManager;
-import dev.kylejulian.tws.data.AfkDatabaseManager;
 import dev.kylejulian.tws.extensions.TabPluginHelper;
 
 public class PlayerListener implements Listener {
 
 	private final JavaPlugin plugin;
-	private final AfkDatabaseManager afkDatabase;
+	private final IAfkDatabaseManager afkDatabase;
 	private final ConfigurationManager configManager;
 	private final HashMap<UUID,BukkitTask> playerAfkManagerTasks;
 	
-	public PlayerListener(JavaPlugin plugin, AfkDatabaseManager afkDatabase, ConfigurationManager configManager) {
+	public PlayerListener(JavaPlugin plugin, IAfkDatabaseManager afkDatabase, ConfigurationManager configManager) {
 		this.plugin = plugin;
 		this.afkDatabase = afkDatabase;
 		this.configManager = configManager;

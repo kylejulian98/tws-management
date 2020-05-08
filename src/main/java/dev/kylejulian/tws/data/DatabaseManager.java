@@ -3,12 +3,13 @@ package dev.kylejulian.tws.data;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import dev.kylejulian.tws.data.interfaces.IDatabaseManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
 import dev.kylejulian.tws.data.callbacks.BooleanQueryCallback;
 
-public abstract class DatabaseManager {
+public abstract class DatabaseManager implements IDatabaseManager {
 
 	private final DatabaseConnectionManager databaseConnectionManager;
 	private final JavaPlugin plugin;

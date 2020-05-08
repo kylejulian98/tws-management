@@ -5,6 +5,8 @@ import java.net.URL;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.kylejulian.tws.data.entities.MojangUserModel;
+import dev.kylejulian.tws.data.entities.MojangUserNameModel;
 
 public class MojangApi {
 

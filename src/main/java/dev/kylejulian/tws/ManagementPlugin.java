@@ -9,7 +9,7 @@ import dev.kylejulian.tws.configuration.AfkConfigModel;
 import dev.kylejulian.tws.configuration.ConfigModel;
 import dev.kylejulian.tws.configuration.ConfigurationManager;
 import dev.kylejulian.tws.configuration.DatabaseConfigModel;
-import dev.kylejulian.tws.data.AfkDatabaseManager;
+import dev.kylejulian.tws.data.sqlite.AfkDatabaseManager;
 import dev.kylejulian.tws.data.DatabaseConnectionManager;
 import dev.kylejulian.tws.data.MojangApi;
 import dev.kylejulian.tws.player.PlayerListener;

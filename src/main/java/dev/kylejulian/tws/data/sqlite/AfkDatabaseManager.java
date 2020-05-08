@@ -1,4 +1,4 @@
-package dev.kylejulian.tws.data;
+package dev.kylejulian.tws.data.sqlite;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,13 +8,16 @@ import java.util.ArrayList;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import dev.kylejulian.tws.data.DatabaseConnectionManager;
+import dev.kylejulian.tws.data.DatabaseManager;
+import dev.kylejulian.tws.data.interfaces.IAfkDatabaseManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import dev.kylejulian.tws.data.callbacks.AfkKickExemptListQueryCallback;
 import dev.kylejulian.tws.data.callbacks.BooleanQueryCallback;
 import dev.kylejulian.tws.data.entities.AfkKickExemptList;
 
-public class AfkDatabaseManager extends DatabaseManager {
+public class AfkDatabaseManager extends DatabaseManager implements IAfkDatabaseManager {
 
 	public AfkDatabaseManager(JavaPlugin plugin, DatabaseConnectionManager databaseConnectionManager) {
 		super(plugin, databaseConnectionManager);

@@ -2,6 +2,7 @@ package dev.kylejulian.tws.afk;
 
 import java.util.UUID;
 
+import dev.kylejulian.tws.data.interfaces.IAfkDatabaseManager;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -9,7 +10,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import dev.kylejulian.tws.afk.events.AfkEvent;
 import dev.kylejulian.tws.configuration.AfkConfigModel;
-import dev.kylejulian.tws.data.AfkDatabaseManager;
+import dev.kylejulian.tws.data.sqlite.AfkDatabaseManager;
 import dev.kylejulian.tws.data.callbacks.BooleanQueryCallback;
 
 /**
@@ -22,7 +23,7 @@ public class AfkManager extends BukkitRunnable {
 	private int afkMinutes;
 	private final boolean alreadyAfk;
 	private final JavaPlugin plugin;
-	private final AfkDatabaseManager afkDatabase;
+	private final IAfkDatabaseManager afkDatabase;
 	private final AfkConfigModel afkConfig;
 	private final UUID playerId;
 	
@@ -45,7 +46,7 @@ public class AfkManager extends BukkitRunnable {
 	 * @param playerId Player whom this AFK Manager belongs to
 	 * @param alreadyAfk Boolean flag to indicate whether or not the Player was already AFK when this AFK Manager was created
 	 */
-	public AfkManager(JavaPlugin plugin, AfkDatabaseManager afkDatabase, AfkConfigModel afkConfig, UUID playerId, boolean alreadyAfk) {
+	public AfkManager(JavaPlugin plugin, IAfkDatabaseManager afkDatabase, AfkConfigModel afkConfig, UUID playerId, boolean alreadyAfk) {
 		this.plugin = plugin;
 		this.afkDatabase = afkDatabase;
 		this.afkConfig = afkConfig;

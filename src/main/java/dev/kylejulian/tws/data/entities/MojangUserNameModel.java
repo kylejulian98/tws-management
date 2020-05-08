@@ -1,4 +1,4 @@
-package dev.kylejulian.tws.data;
+package dev.kylejulian.tws.data.entities;
 
 public class MojangUserNameModel {
 

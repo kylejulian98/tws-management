@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import dev.kylejulian.tws.data.interfaces.IAfkDatabaseManager;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -18,7 +19,6 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import dev.kylejulian.tws.afk.events.AfkCommandEvent;
-import dev.kylejulian.tws.data.AfkDatabaseManager;
 import dev.kylejulian.tws.data.MojangApi;
 import dev.kylejulian.tws.data.callbacks.AfkKickExemptListQueryCallback;
 import dev.kylejulian.tws.data.callbacks.BooleanQueryCallback;
@@ -27,12 +27,12 @@ import dev.kylejulian.tws.data.entities.AfkKickExemptList;
 public class AfkCommand implements CommandExecutor {
 
 	private final JavaPlugin plugin;
-	private final AfkDatabaseManager afkDatabaseManager;
+	private final IAfkDatabaseManager afkDatabaseManager;
 	private final MojangApi mojangApi;
 
 	private final int pageSize = 5;
 
-	public AfkCommand(JavaPlugin plugin, AfkDatabaseManager afkDatabaseManager, MojangApi mojangApi) {
+	public AfkCommand(JavaPlugin plugin, IAfkDatabaseManager afkDatabaseManager, MojangApi mojangApi) {
 		this.plugin = plugin;
 		this.afkDatabaseManager = afkDatabaseManager;
 		this.mojangApi = mojangApi;
