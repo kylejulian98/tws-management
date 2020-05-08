@@ -23,7 +23,6 @@ repositories {
     
   	maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
   	maven { url = 'https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core' }
-  	maven { url = 'https://mvnrepository.com/artifact/org.postgresql/postgresql' }
   	maven { url = 'https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2' }
   	 
   	mavenLocal() // This is needed for CraftBukkit and Spigot.
@@ -35,7 +34,6 @@ dependencies {
     implementation 'com.google.guava:guava:28.0-jre'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.10.3'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.10.3'
-    implementation 'org.postgresql:postgresql:42.2.12' // Jdbc Driver
     implementation 'org.apache.commons:commons-dbcp2:2.7.0' // Connection Pooling
     
     // Use JUnit test framework
