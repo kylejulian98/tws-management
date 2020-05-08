@@ -1,14 +1,12 @@
 package dev.kylejulian.tws;
 
+import dev.kylejulian.tws.configuration.*;
+import dev.kylejulian.tws.world.DaytimeListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import dev.kylejulian.tws.afk.AfkEventListener;
 import dev.kylejulian.tws.commands.AfkCommand;
 import dev.kylejulian.tws.commands.tabcompleters.AfkTabCompleter;
-import dev.kylejulian.tws.configuration.AfkConfigModel;
-import dev.kylejulian.tws.configuration.ConfigModel;
-import dev.kylejulian.tws.configuration.ConfigurationManager;
-import dev.kylejulian.tws.configuration.DatabaseConfigModel;
 import dev.kylejulian.tws.data.sqlite.AfkDatabaseManager;
 import dev.kylejulian.tws.data.DatabaseConnectionManager;
 import dev.kylejulian.tws.data.MojangApi;
@@ -20,7 +18,7 @@ public class ManagementPlugin extends JavaPlugin {
     private final DatabaseConnectionManager databaseConnectionManager; 
     
     private final AfkDatabaseManager afkDatabase;
-    
+
     public ManagementPlugin() {
     	this.configManager = new ConfigurationManager(this, "config.json");
     	this.configManager.reload();
@@ -35,11 +33,13 @@ public class ManagementPlugin extends JavaPlugin {
 	public void onEnable() {
 		ConfigModel config = this.configManager.getConfig();
 		AfkConfigModel afkConfig = config.getAfkConfig();
+		NightResetConfig nightResetConfig = config.getNightResetConfig();
 		
 		this.afkDatabase.setupDefaultSchema(null);
 		
 		this.getServer().getPluginManager().registerEvents(new PlayerListener(this, this.afkDatabase, this.configManager), this);
 		this.getServer().getPluginManager().registerEvents(new AfkEventListener(this, afkConfig), this);
+		this.getServer().getPluginManager().registerEvents(new DaytimeListener(this, nightResetConfig), this);
 		
 		this.getCommand("afk").setExecutor(new AfkCommand(this, this.afkDatabase, new MojangApi()));
 		this.getCommand("afk").setTabCompleter(new AfkTabCompleter(this));

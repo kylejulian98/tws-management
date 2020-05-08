@@ -40,6 +40,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     
     compileOnly files('lib/TABv2.7.3.jar')
+    compileOnly 'org.jetbrains:annotations:19.0.0'
 
   	compileOnly 'org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT'
 }

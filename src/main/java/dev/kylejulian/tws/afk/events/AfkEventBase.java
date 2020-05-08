@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 
 abstract class AfkEventBase extends Event {
 	
@@ -13,8 +14,8 @@ abstract class AfkEventBase extends Event {
 	public AfkEventBase(UUID playerId) {
 		this.playerId = playerId;
 	}
-	
-	public UUID getPlayerId() {
+
+	public @NotNull UUID getPlayerId() {
 		return this.playerId;
 	}
 	

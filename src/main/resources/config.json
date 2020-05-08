@@ -24,6 +24,9 @@
 			"onPlayerExpChange"
 		]
 	},
+	"nightResetConfig": {
+		"enabled": true
+	},
 	"databaseConfig": {
 		"database": "tws-local.db",
 		"directory": "D:\\Games\\Minecraft\\Server\\plugins\\tws.management",
