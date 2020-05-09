@@ -26,13 +26,17 @@ public class AfkDatabaseManager extends DatabaseManager implements IAfkDatabaseM
 	@Override
 	public void setupDefaultSchema(final BooleanQueryCallback callback) {
 		final String sqlCommand = "CREATE TABLE IF NOT EXISTS afk_kick_exempt (id INTEGER PRIMARY KEY NOT NULL, player_uuid UUID NOT NULL)";
+		final String sqlIndexCommand = "CREATE UNIQUE INDEX IF NOT EXISTS idx_afk_kick_exempt_id ON afk_kick_exempt (id)";
 
 		Runnable task = () -> {
 			boolean result = false;
 
 			try (Connection connection = this.getConnection();
-					PreparedStatement statement = connection.prepareStatement(sqlCommand)) {
-				result = statement.execute();
+					PreparedStatement statement = connection.prepareStatement(sqlCommand);
+					PreparedStatement indexStatement = connection.prepareStatement(sqlIndexCommand)) {
+				boolean schemaResult = statement.execute();
+				boolean indexResult = indexStatement.execute();
+				result = schemaResult && indexResult;
 			} catch (SQLException e) {
 				this.getPlugin().getLogger().log(Level.WARNING,
 						"Unable to setup Default Schema for AFK Database tables.");

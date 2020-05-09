@@ -14,8 +14,6 @@ public class DatabaseConnectionManager {
 		this.connectionPool = new BasicDataSource();
 		this.connectionPool.setDriverClassName("org.sqlite.JDBC");
 		this.connectionPool.setUrl("jdbc:sqlite:" + databaseConfig.getDirectory() + "\\" + databaseConfig.getDatabase());
-		this.connectionPool.setUsername(databaseConfig.getUserName());
-		this.connectionPool.setPassword(databaseConfig.getPassword());
 		this.connectionPool.setInitialSize(1);
 		this.connectionPool.setMaxTotal(databaseConfig.getMaxConcurrentConnections());
 	}

@@ -30,8 +30,6 @@
 	"databaseConfig": {
 		"database": "tws-local.db",
 		"directory": "D:\\Games\\Minecraft\\Server\\plugins\\tws.management",
-		"userName": "twsadmin",
-		"password": "mysecretpassword",
 		"maxConcurrentConnections": 5
 	}
 }
