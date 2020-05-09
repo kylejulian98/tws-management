@@ -2,7 +2,7 @@ package dev.kylejulian.tws.world;
 
 import dev.kylejulian.tws.afk.events.AfkCancelledEvent;
 import dev.kylejulian.tws.afk.events.AfkEvent;
-import dev.kylejulian.tws.configuration.NightResetConfig;
+import dev.kylejulian.tws.configuration.NightResetConfigModel;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,12 +20,12 @@ public class DaytimeListener implements Listener {
 
     private final ArrayList<UUID> afkPlayers;
     private final JavaPlugin plugin;
-    private final NightResetConfig nightResetConfig;
+    private final NightResetConfigModel nightResetConfigModel;
 
-    public DaytimeListener(JavaPlugin plugin, NightResetConfig nightResetConfig) {
+    public DaytimeListener(JavaPlugin plugin, NightResetConfigModel nightResetConfigModel) {
         this.afkPlayers = new ArrayList<>();
         this.plugin = plugin;
-        this.nightResetConfig = nightResetConfig;
+        this.nightResetConfigModel = nightResetConfigModel;
     }
 
     @EventHandler
@@ -39,9 +39,7 @@ public class DaytimeListener implements Listener {
     @EventHandler
     public void onAfkCancelled(final AfkCancelledEvent e) {
         UUID playerId = e.getPlayerId();
-        if (this.afkPlayers.contains(playerId)){
-            this.afkPlayers.remove(playerId);
-        }
+        this.afkPlayers.remove(playerId);
     }
 
     @EventHandler
@@ -73,7 +71,7 @@ public class DaytimeListener implements Listener {
     }
 
     private boolean verifyNightResetRules() {
-        if (!this.nightResetConfig.getEnabled()) { // Not enabled, skip
+        if (!this.nightResetConfigModel.getEnabled()) { // Not enabled, skip
             return false;
         }
 

@@ -64,7 +64,7 @@ public class AfkManager extends BukkitRunnable {
 			return;
 		}
 		
-		this.addPlayerAfkMinutes(1);
+		this.addPlayerAfkMinutes();
 		
 		if (!this.alreadyAfk && this.getPlayerAfkMinutes() == afkTime) { // Player is AFK
 			AfkEvent event = new AfkEvent(this.playerId);
@@ -75,28 +75,23 @@ public class AfkManager extends BukkitRunnable {
 			});
 		}
 		
-		BooleanQueryCallback callback = new BooleanQueryCallback() {
-			@Override
-			public void onQueryComplete(Boolean result) {
-				if (!result) { // Player is not Kick exempt
-					if (canKickPlayer(player, afkKickTime, afkTime)) {
-						player.kickPlayer(afkConfig.getKickMessage());
-					}
+		BooleanQueryCallback callback = result -> {
+			if (!result) { // Player is not Kick exempt
+				if (canKickPlayer(player, afkKickTime, afkTime)) {
+					player.kickPlayer(afkConfig.getKickMessage());
 				}
 			}
 		};
 		
-		this.afkDatabase.isPlayerKickExempt(playerId, callback);
+		this.afkDatabase.isKickExempt(playerId, callback);
 	}
 	
 	private boolean canKickPlayer(Player player, int afkKickTime, int afkTime) {
 		if (this.getPlayerAfkMinutes() >= (afkKickTime + afkTime)) { // Player has to be inactive for both the AFK time and AFK Kick time
 			int numberOfPlayersOnline = this.plugin.getServer().getOnlinePlayers().size(); 
 			int numberOfRequiredPlayersToKick = this.afkConfig.getPlayerCountNeededForKick();
-			
-			if (numberOfPlayersOnline >= numberOfRequiredPlayersToKick) {
-				return true;
-			}
+
+			return numberOfPlayersOnline >= numberOfRequiredPlayersToKick;
 		}
 		
 		return false;
@@ -106,7 +101,7 @@ public class AfkManager extends BukkitRunnable {
 		return this.afkMinutes;
 	}
 	
-	private void addPlayerAfkMinutes(int minutes) {
-		this.afkMinutes = this.afkMinutes + minutes;
+	private void addPlayerAfkMinutes() {
+		this.afkMinutes = this.afkMinutes + 1;
 	}
 }

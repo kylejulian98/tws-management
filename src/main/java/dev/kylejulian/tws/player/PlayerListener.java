@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import dev.kylejulian.tws.data.interfaces.IAfkDatabaseManager;
+import dev.kylejulian.tws.data.interfaces.IHudDatabaseManager;
+import dev.kylejulian.tws.player.hud.events.HudEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,100 +23,105 @@ import dev.kylejulian.tws.configuration.AfkConfigModel;
 import dev.kylejulian.tws.configuration.ConfigModel;
 import dev.kylejulian.tws.configuration.ConfigurationManager;
 import dev.kylejulian.tws.extensions.TabPluginHelper;
+import org.jetbrains.annotations.NotNull;
 
 public class PlayerListener implements Listener {
 
 	private final JavaPlugin plugin;
-	private final IAfkDatabaseManager afkDatabase;
+	private final IAfkDatabaseManager afkDatabaseManager;
+	private final IHudDatabaseManager hudDatabaseManager;
 	private final ConfigurationManager configManager;
-	private final HashMap<UUID,BukkitTask> playerAfkManagerTasks;
+	private final HashMap<UUID,Integer> playerAfkManagerTasks;
 	
-	public PlayerListener(JavaPlugin plugin, IAfkDatabaseManager afkDatabase, ConfigurationManager configManager) {
+	public PlayerListener(@NotNull JavaPlugin plugin, @NotNull IAfkDatabaseManager afkDatabaseManager,
+						  @NotNull IHudDatabaseManager hudDatabaseManager, @NotNull ConfigurationManager configManager) {
 		this.plugin = plugin;
-		this.afkDatabase = afkDatabase;
+		this.afkDatabaseManager = afkDatabaseManager;
+		this.hudDatabaseManager = hudDatabaseManager;
 		this.configManager = configManager;
 		this.playerAfkManagerTasks = new HashMap<>();
 	}
 	
 	@EventHandler
-	public void onJoin(PlayerJoinEvent e) {
+	public void onJoin(@NotNull PlayerJoinEvent e) {
 		Player player = e.getPlayer();
-		UUID playerId = player.getUniqueId();
-		BukkitTask afkTimerTask = this.createAndStartAfkManagerTask(playerId);
-		
-		this.playerAfkManagerTasks.put(playerId, afkTimerTask);
+		final UUID playerId = player.getUniqueId();
+		Integer taskId = this.createAndStartAfkManagerTask(playerId);
+
+		this.playerAfkManagerTasks.put(playerId, taskId);
+
+		this.hudDatabaseManager.isEnabled(playerId, result -> {
+			if (result) {
+				plugin.getServer().getPluginManager().callEvent(new HudEvent(playerId, true));
+			}
+		});
 	}
-	
+
 	@EventHandler
-	public void onLeave(PlayerQuitEvent e) {
+	public void onLeave(@NotNull PlayerQuitEvent e) {
 		Player player = e.getPlayer();
-		BukkitTask afkManagerTask = this.playerAfkManagerTasks.getOrDefault(player.getUniqueId(), null);
-		
-		if (afkManagerTask != null) {
-			afkManagerTask.cancel();
+		final UUID playerId = player.getUniqueId();
+		Integer taskId = this.playerAfkManagerTasks.getOrDefault(playerId, null);
+
+		if (taskId != null) {
+			this.plugin.getServer().getScheduler().cancelTask(taskId);
 		}	
 	}
 	
 	@EventHandler
-	public void onAfkCancelled(AfkCancelledEvent e) {
-		UUID playerId = e.getPlayerId();
-		BukkitTask afkTimerTask = this.playerAfkManagerTasks.getOrDefault(playerId, null);
-		
-		if (afkTimerTask != null) { // In the event of a reload
-			afkTimerTask.cancel();
+	public void onAfkCancelled(@NotNull AfkCancelledEvent e) {
+		final UUID playerId = e.getPlayerId();
+		Integer taskId = this.playerAfkManagerTasks.getOrDefault(playerId, null);
+
+		if (taskId != null) { // In the event of a reload
+			this.plugin.getServer().getScheduler().cancelTask(taskId);
 		}
 		
-		Runnable tabTask = () -> {
-			TabPluginHelper.setTabSuffix(this.plugin, playerId, ChatColor.RESET + "");
-		};
+		Runnable tabTask = () -> TabPluginHelper.setTabSuffix(this.plugin, playerId, ChatColor.RESET + "");
 		this.plugin.getServer().getScheduler().runTask(this.plugin, tabTask);
-		
-		afkTimerTask = this.createAndStartAfkManagerTask(playerId);
-		this.playerAfkManagerTasks.put(playerId, afkTimerTask);
+
+		taskId = this.createAndStartAfkManagerTask(playerId);
+		this.playerAfkManagerTasks.put(playerId, taskId);
 	}
 	
 	@EventHandler
-	public void onAfkCommand(AfkCommandEvent e) {
+	public void onAfkCommand(@NotNull AfkCommandEvent e) {
 		UUID playerId = e.getPlayerId();
-		BukkitTask afkTimerTask = this.playerAfkManagerTasks.getOrDefault(playerId, null);
+		Integer taskId = this.playerAfkManagerTasks.getOrDefault(playerId, null);
 		
-		if (afkTimerTask != null) { // In the event of a reload
-			afkTimerTask.cancel();
+		if (taskId != null) { // In the event of a reload
+			this.plugin.getServer().getScheduler().cancelTask(taskId);
 		}
-		
-		afkTimerTask = this.createAndStartAfkManagerTask(playerId, true); // Player triggered this AFK event, they are already AFK
-		this.playerAfkManagerTasks.put(playerId, afkTimerTask);
+
+		taskId = this.createAndStartAfkManagerTask(playerId, true); // Player triggered this AFK event, they are already AFK
+		this.playerAfkManagerTasks.put(playerId, taskId);
 		
 		// Raise new AFK Event, as the AFKManager will not raise another due to the alreadyAfk being set to true property
 		AfkEvent event = new AfkEvent(playerId);
-		Runnable afkEventTask = () -> {
-			this.plugin.getServer().getPluginManager().callEvent(event);
-		};
+		Runnable afkEventTask = () -> this.plugin.getServer().getPluginManager().callEvent(event);
 		this.plugin.getServer().getScheduler().runTask(this.plugin, afkEventTask); // Cannot raise a new event asynchronously
 	}
 	
 	@EventHandler
-	public void onAfk(AfkEvent e) {
+	public void onAfk(@NotNull AfkEvent e) {
 		UUID playerId = e.getPlayerId();
 		
-		Runnable tabTask = () -> {
-			TabPluginHelper.setTabSuffix(this.plugin, playerId, ChatColor.GRAY + "[" + ChatColor.RED + "AFK" + ChatColor.GRAY + "] " + ChatColor.RESET);
-		};
+		Runnable tabTask = () -> TabPluginHelper.setTabSuffix(this.plugin, playerId, ChatColor.GRAY + "[" + ChatColor.RED + "AFK" + ChatColor.GRAY + "] " + ChatColor.RESET);
 		this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, tabTask);
 	}
 	
-	private BukkitTask createAndStartAfkManagerTask(UUID playerId) {
+	private Integer createAndStartAfkManagerTask(@NotNull UUID playerId) {
 		return createAndStartAfkManagerTask(playerId, false);
 	}
 	
-	private BukkitTask createAndStartAfkManagerTask(UUID playerId, boolean alreadyAfk) {
+	private Integer createAndStartAfkManagerTask(@NotNull UUID playerId, boolean alreadyAfk) {
 		ConfigModel config = this.configManager.getConfig();
 		AfkConfigModel afkConfig = config.getAfkConfig();
 		
-		AfkManager playerAfkManager = new AfkManager(this.plugin, this.afkDatabase, afkConfig, playerId, alreadyAfk);
+		AfkManager playerAfkManager = new AfkManager(this.plugin, this.afkDatabaseManager, afkConfig, playerId, alreadyAfk);
 		BukkitTask afkTimerTask = playerAfkManager
 				.runTaskTimerAsynchronously(plugin, 1200, 1200); // 1200 ticks = 60 seconds
 		
-		return afkTimerTask;
+		return afkTimerTask.getTaskId();
 	}
 }

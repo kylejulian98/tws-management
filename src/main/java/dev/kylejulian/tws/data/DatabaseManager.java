@@ -5,7 +5,6 @@ import java.sql.SQLException;
 
 import dev.kylejulian.tws.data.interfaces.IDatabaseManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitTask;
 
 import dev.kylejulian.tws.data.callbacks.BooleanQueryCallback;
 
@@ -30,24 +29,28 @@ public abstract class DatabaseManager implements IDatabaseManager {
 		return this.plugin;
 	}
 
+
+	protected void queueCallbackTaskSync(final BooleanQueryCallback callback, boolean result) {
+		final boolean callbackResult = result;
+		Runnable callbackTask = () -> callback.onQueryComplete(callbackResult);
+
+		this.executeQuerySync(callbackTask);
+	}
+
 	/**
 	 * Queues up a Runnable task on the Server Scheduler asynchronously
 	 * 
-	 * @param runnable
-	 * @return The created BukkitTask
 	 */
-	protected BukkitTask executeQueryAsync(Runnable runnable) {
-		return this.getPlugin().getServer().getScheduler().runTaskAsynchronously(this.plugin, runnable);
+	protected void executeQueryAsync(Runnable runnable) {
+		this.getPlugin().getServer().getScheduler().runTaskAsynchronously(this.plugin, runnable);
 	}
 
 	/**
 	 * Queues up a Runnable task on the Server scheduler synchronously
 	 * 
-	 * @param runnable
-	 * @return
 	 */
-	protected BukkitTask executeQuerySync(Runnable runnable) {
-		return this.getPlugin().getServer().getScheduler().runTask(this.plugin, runnable);
+	protected void executeQuerySync(Runnable runnable) {
+		this.getPlugin().getServer().getScheduler().runTask(this.plugin, runnable);
 	}
 
 	/**

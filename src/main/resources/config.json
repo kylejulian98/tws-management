@@ -27,6 +27,10 @@
 	"nightResetConfig": {
 		"enabled": true
 	},
+	"hudConfig": {
+		"enabled": true,
+		"refreshRateTicks": 10
+	},
 	"databaseConfig": {
 		"database": "tws-local.db",
 		"directory": "D:\\Games\\Minecraft\\Server\\plugins\\tws.management",

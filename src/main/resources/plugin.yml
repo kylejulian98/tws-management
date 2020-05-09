@@ -13,6 +13,11 @@ commands:
       Example: /<command>
       Example: /<command> exempt add Player1
       Example: /<command> exempt remove Player1
+  hud:
+    description: To enable or disable the HUD for showing coordinates and time
+    usage: |
+      /<command>
+      Example: /<command>
 permissions:
   tws.*:
     description: Gives access to all commands from the TWS plugin.

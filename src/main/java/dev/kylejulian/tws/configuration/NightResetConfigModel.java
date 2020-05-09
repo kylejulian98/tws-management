@@ -1,6 +1,6 @@
 package dev.kylejulian.tws.configuration;
 
-public class NightResetConfig {
+public class NightResetConfigModel {
 
     private boolean enabled;
 

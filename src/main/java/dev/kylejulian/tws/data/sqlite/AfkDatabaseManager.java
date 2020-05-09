@@ -33,16 +33,23 @@ public class AfkDatabaseManager extends DatabaseManager implements IAfkDatabaseM
 			boolean result = false;
 
 			try (Connection connection = this.getConnection();
-					PreparedStatement statement = connection.prepareStatement(sqlCommand);
-					PreparedStatement indexStatement = connection.prepareStatement(sqlIndexCommand);
-					PreparedStatement indexPlayerIdStatement = connection.prepareStatement(sqlPlayerIdIndexCommand)) {
-				boolean schemaResult = statement.execute();
-				boolean indexResult = indexStatement.execute();
-				boolean playerIdIndexResult = indexPlayerIdStatement.execute();
-				result = schemaResult && indexResult && playerIdIndexResult;
+					PreparedStatement statement = connection.prepareStatement(sqlCommand)) {
+				result = statement.execute();
 			} catch (SQLException e) {
 				this.getPlugin().getLogger().log(Level.WARNING,
-						"Unable to setup Default Schema for AFK Database tables.");
+						"Unable to setup Default Schema for AFK Database table.");
+				this.getPlugin().getLogger().log(Level.WARNING, e.getMessage());
+			}
+
+			try (Connection connection = this.getConnection();
+				 PreparedStatement indexStatement = connection.prepareStatement(sqlIndexCommand);
+				 PreparedStatement indexPlayerIdStatement = connection.prepareStatement(sqlPlayerIdIndexCommand)) {
+				boolean indexResult = indexStatement.execute();
+				boolean playerIdIndexResult = indexPlayerIdStatement.execute();
+				result = result && indexResult && playerIdIndexResult;
+			} catch (SQLException e) {
+				this.getPlugin().getLogger().log(Level.WARNING,
+						"Unable to setup Default Indexes for AFK Database table.");
 				this.getPlugin().getLogger().log(Level.WARNING, e.getMessage());
 			}
 
@@ -60,7 +67,8 @@ public class AfkDatabaseManager extends DatabaseManager implements IAfkDatabaseM
 	 * @param callback The result of the Query as a {@link BooleanQueryCallback}
 	 * @param playerId Player to remove from the Exempt list
 	 */
-	public void addPlayerToKickExempt(final UUID playerId, final BooleanQueryCallback callback) {
+	@Override
+	public void addPlayer(final UUID playerId, final BooleanQueryCallback callback) {
 		final String sqlCommand = "INSERT INTO afk_kick_exempt (player_uuid) VALUES (?)";
 
 		Runnable task = () -> {
@@ -90,7 +98,8 @@ public class AfkDatabaseManager extends DatabaseManager implements IAfkDatabaseM
 	 * @param callback The result of the Query as a {@link BooleanQueryCallback}
 	 * @param playerId Player to remove from the Exempt list
 	 */
-	public void removePlayerFromKickExempt(final UUID playerId, final BooleanQueryCallback callback) {
+	@Override
+	public void removePlayer(final UUID playerId, final BooleanQueryCallback callback) {
 		final String sqlCommand = "DELETE FROM afk_kick_exempt WHERE player_uuid = ?";
 
 		Runnable task = () -> {
@@ -120,7 +129,8 @@ public class AfkDatabaseManager extends DatabaseManager implements IAfkDatabaseM
 	 * @param playerId Player to lookup
 	 * @param callback The result of the Query as a {@link BooleanQueryCallback}
 	 */
-	public void isPlayerKickExempt(final UUID playerId, final BooleanQueryCallback callback) {
+	@Override
+	public void isKickExempt(final UUID playerId, final BooleanQueryCallback callback) {
 		final String sqlCommand = "SELECT id FROM afk_kick_exempt WHERE player_uuid=?";
 
 		Runnable task = () -> {
@@ -166,7 +176,8 @@ public class AfkDatabaseManager extends DatabaseManager implements IAfkDatabaseM
 	 * @param pageSize Number of results to be returned
 	 * @param callback The result of the Query as a {@link AfkKickExemptListQueryCallback}
 	 */
-	public void getAfkKickExemptPlayers(final int pageIndex, final int pageSize, final AfkKickExemptListQueryCallback callback) {
+	@Override
+	public void getPlayers(final int pageIndex, final int pageSize, final AfkKickExemptListQueryCallback callback) {
 		final String sqlCommand = "SELECT * FROM afk_kick_exempt LIMIT ? OFFSET ?";
 		final String sqlCountCommand = "SELECT COUNT(*) FROM afk_kick_exempt";
 		int offset = pageSize * (pageIndex - 1);
@@ -238,13 +249,6 @@ public class AfkDatabaseManager extends DatabaseManager implements IAfkDatabaseM
 		this.executeQueryAsync(task);
 	}
 
-	private void queueCallbackTaskSync(final BooleanQueryCallback callback, boolean result) {
-		final boolean callbackResult = result;
-		Runnable callbackTask = () -> callback.onQueryComplete(callbackResult);
-
-		this.executeQuerySync(callbackTask);
-	}
-	
 	private void queueCallbackTaskSync(final AfkKickExemptListQueryCallback callback, AfkKickExemptList result) {
 		final AfkKickExemptList callbackResult = result;
 		Runnable callbackTask = () -> callback.onQueryComplete(callbackResult);
