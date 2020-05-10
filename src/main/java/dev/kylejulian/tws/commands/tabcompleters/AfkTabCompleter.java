@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 public class AfkTabCompleter implements TabCompleter {
 
@@ -18,9 +19,9 @@ public class AfkTabCompleter implements TabCompleter {
 	}
 	
 	@Override
-	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+	public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
 		
-		ArrayList<String> autoCompleteList = new ArrayList<String>();
+		ArrayList<String> autoCompleteList = new ArrayList<>();
 
         // First arg is a space
         if (args.length == 1) {

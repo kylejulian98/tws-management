@@ -1,24 +1,24 @@
 package dev.kylejulian.tws;
 
+import dev.kylejulian.tws.afk.AfkEventListener;
+import dev.kylejulian.tws.commands.AfkCommand;
 import dev.kylejulian.tws.commands.HudCommand;
+import dev.kylejulian.tws.commands.tabcompleters.AfkTabCompleter;
 import dev.kylejulian.tws.configuration.*;
-import dev.kylejulian.tws.data.DatabaseManager;
+import dev.kylejulian.tws.data.DatabaseConnectionManager;
+import dev.kylejulian.tws.data.MojangApi;
 import dev.kylejulian.tws.data.interfaces.IAfkDatabaseManager;
 import dev.kylejulian.tws.data.interfaces.IDatabaseManager;
 import dev.kylejulian.tws.data.interfaces.IHudDatabaseManager;
+import dev.kylejulian.tws.data.sqlite.AfkDatabaseManager;
 import dev.kylejulian.tws.data.sqlite.HudDatabaseManager;
+import dev.kylejulian.tws.player.PlayerListener;
 import dev.kylejulian.tws.player.hud.HudListener;
 import dev.kylejulian.tws.world.DaytimeListener;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import dev.kylejulian.tws.afk.AfkEventListener;
-import dev.kylejulian.tws.commands.AfkCommand;
-import dev.kylejulian.tws.commands.tabcompleters.AfkTabCompleter;
-import dev.kylejulian.tws.data.sqlite.AfkDatabaseManager;
-import dev.kylejulian.tws.data.DatabaseConnectionManager;
-import dev.kylejulian.tws.data.MojangApi;
-import dev.kylejulian.tws.player.PlayerListener;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 public class ManagementPlugin extends JavaPlugin {
 
@@ -54,9 +54,9 @@ public class ManagementPlugin extends JavaPlugin {
 		this.getServer().getPluginManager().registerEvents(new DaytimeListener(this, nightResetConfig), this);
 		this.getServer().getPluginManager().registerEvents(new HudListener(this, hudConfig), this);
 		
-		this.getCommand("afk").setExecutor(new AfkCommand(this, this.afkDatabaseManager, new MojangApi()));
-		this.getCommand("afk").setTabCompleter(new AfkTabCompleter(this));
-		this.getCommand("hud").setExecutor(new HudCommand(this, this.hudDatabaseManager));
+		Objects.requireNonNull(this.getCommand("afk")).setExecutor(new AfkCommand(this, this.afkDatabaseManager, new MojangApi()));
+		Objects.requireNonNull(this.getCommand("afk")).setTabCompleter(new AfkTabCompleter(this));
+		Objects.requireNonNull(this.getCommand("hud")).setExecutor(new HudCommand(this, this.hudDatabaseManager));
 	}
 	
 	@Override

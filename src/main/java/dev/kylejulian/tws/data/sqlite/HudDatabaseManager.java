@@ -5,6 +5,7 @@ import dev.kylejulian.tws.data.DatabaseManager;
 import dev.kylejulian.tws.data.callbacks.BooleanQueryCallback;
 import dev.kylejulian.tws.data.interfaces.IHudDatabaseManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -58,7 +59,7 @@ public class HudDatabaseManager extends DatabaseManager implements IHudDatabaseM
     }
 
     @Override
-    public void isEnabled(UUID playerId, BooleanQueryCallback callback) {
+    public void isEnabled(@NotNull UUID playerId, BooleanQueryCallback callback) {
         final String sqlCommand = "SELECT id FROM hud WHERE player_uuid = ?";
 
         Runnable task = () -> {
@@ -99,7 +100,7 @@ public class HudDatabaseManager extends DatabaseManager implements IHudDatabaseM
     }
 
     @Override
-    public void removePlayer(UUID playerId, BooleanQueryCallback callback) {
+    public void removePlayer(@NotNull UUID playerId, BooleanQueryCallback callback) {
         final String sqlCommand = "DELETE FROM hud WHERE player_uuid = ?";
 
         Runnable task = () -> {
@@ -124,7 +125,7 @@ public class HudDatabaseManager extends DatabaseManager implements IHudDatabaseM
     }
 
     @Override
-    public void addPlayer(UUID playerId, BooleanQueryCallback callback) {
+    public void addPlayer(@NotNull UUID playerId, BooleanQueryCallback callback) {
         final String sqlCommand = "INSERT INTO hud (player_uuid) VALUES (?)";
 
         Runnable task = () -> {

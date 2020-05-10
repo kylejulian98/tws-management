@@ -16,6 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import dev.kylejulian.tws.data.callbacks.AfkKickExemptListQueryCallback;
 import dev.kylejulian.tws.data.callbacks.BooleanQueryCallback;
 import dev.kylejulian.tws.data.entities.AfkKickExemptList;
+import org.jetbrains.annotations.NotNull;
 
 public class AfkDatabaseManager extends DatabaseManager implements IAfkDatabaseManager {
 
@@ -68,7 +69,7 @@ public class AfkDatabaseManager extends DatabaseManager implements IAfkDatabaseM
 	 * @param playerId Player to remove from the Exempt list
 	 */
 	@Override
-	public void addPlayer(final UUID playerId, final BooleanQueryCallback callback) {
+	public void addPlayer(final @NotNull UUID playerId, final BooleanQueryCallback callback) {
 		final String sqlCommand = "INSERT INTO afk_kick_exempt (player_uuid) VALUES (?)";
 
 		Runnable task = () -> {
@@ -99,7 +100,7 @@ public class AfkDatabaseManager extends DatabaseManager implements IAfkDatabaseM
 	 * @param playerId Player to remove from the Exempt list
 	 */
 	@Override
-	public void removePlayer(final UUID playerId, final BooleanQueryCallback callback) {
+	public void removePlayer(final @NotNull UUID playerId, final BooleanQueryCallback callback) {
 		final String sqlCommand = "DELETE FROM afk_kick_exempt WHERE player_uuid = ?";
 
 		Runnable task = () -> {
@@ -130,7 +131,7 @@ public class AfkDatabaseManager extends DatabaseManager implements IAfkDatabaseM
 	 * @param callback The result of the Query as a {@link BooleanQueryCallback}
 	 */
 	@Override
-	public void isKickExempt(final UUID playerId, final BooleanQueryCallback callback) {
+	public void isKickExempt(final @NotNull UUID playerId, final BooleanQueryCallback callback) {
 		final String sqlCommand = "SELECT id FROM afk_kick_exempt WHERE player_uuid=?";
 
 		Runnable task = () -> {
@@ -177,7 +178,7 @@ public class AfkDatabaseManager extends DatabaseManager implements IAfkDatabaseM
 	 * @param callback The result of the Query as a {@link AfkKickExemptListQueryCallback}
 	 */
 	@Override
-	public void getPlayers(final int pageIndex, final int pageSize, final AfkKickExemptListQueryCallback callback) {
+	public void getPlayers(final int pageIndex, final int pageSize, final @NotNull AfkKickExemptListQueryCallback callback) {
 		final String sqlCommand = "SELECT * FROM afk_kick_exempt LIMIT ? OFFSET ?";
 		final String sqlCountCommand = "SELECT COUNT(*) FROM afk_kick_exempt";
 		int offset = pageSize * (pageIndex - 1);

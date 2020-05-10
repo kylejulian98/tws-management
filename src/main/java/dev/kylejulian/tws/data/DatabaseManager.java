@@ -57,7 +57,7 @@ public abstract class DatabaseManager implements IDatabaseManager {
 	 * Gets a Connection from the Connection pool
 	 * 
 	 * @return Returns the created or existing Connection
-	 * @throws SQLException
+	 * @throws SQLException If a database access issue occurs
 	 */
 	protected Connection getConnection() throws SQLException {
 		return this.databaseConnectionManager.getConnectionPool().getConnection();

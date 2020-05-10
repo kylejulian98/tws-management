@@ -1,37 +1,27 @@
 package dev.kylejulian.tws.commands;
 
-import java.util.ArrayList;
-import java.util.UUID;
-import java.util.logging.Level;
-
+import dev.kylejulian.tws.afk.events.AfkCommandEvent;
+import dev.kylejulian.tws.data.MojangApi;
 import dev.kylejulian.tws.data.interfaces.IAfkDatabaseManager;
+import net.md_5.bungee.api.chat.*;
+import net.md_5.bungee.api.chat.ClickEvent.Action;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ClickEvent.Action;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import dev.kylejulian.tws.afk.events.AfkCommandEvent;
-import dev.kylejulian.tws.data.MojangApi;
-import dev.kylejulian.tws.data.callbacks.AfkKickExemptListQueryCallback;
-import dev.kylejulian.tws.data.callbacks.BooleanQueryCallback;
-import dev.kylejulian.tws.data.entities.AfkKickExemptList;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.UUID;
+import java.util.logging.Level;
 
 public class AfkCommand implements CommandExecutor {
 
 	private final JavaPlugin plugin;
 	private final IAfkDatabaseManager afkDatabaseManager;
 	private final MojangApi mojangApi;
-
-	private final int pageSize = 5;
 
 	public AfkCommand(JavaPlugin plugin, IAfkDatabaseManager afkDatabaseManager, MojangApi mojangApi) {
 		this.plugin = plugin;
@@ -91,7 +81,6 @@ public class AfkCommand implements CommandExecutor {
 						});
 					} else if (command.equalsIgnoreCase("remove")) {
 						UUID playerId;
-						playerId = null;
 						String target;
 						if (args.length == 3) {
 							target = args[2];
@@ -134,7 +123,8 @@ public class AfkCommand implements CommandExecutor {
 						}
 
 						final int finalPageIndex = pageIndex;
-						this.afkDatabaseManager.getPlayers(pageIndex, this.pageSize, result -> {
+						int pageSize = 5;
+						this.afkDatabaseManager.getPlayers(pageIndex, pageSize, result -> {
 							ArrayList<UUID> playerIds = result.getPlayerIds();
 							int maxPages = result.getPageCount();
 
@@ -218,7 +208,6 @@ public class AfkCommand implements CommandExecutor {
 
 	/***
 	 * Get a Player Id from the Mojang Api based on a username
-	 * @param name
 	 * @return Player Id or null
 	 */
 	private UUID getPlayerId(String name) {
@@ -236,7 +225,6 @@ public class AfkCommand implements CommandExecutor {
 
 	/***
 	 * Get a Player Username from the Mojang Api based on a Player Id
-	 * @param playerId
 	 * @return Username or null
 	 */
 	private String getName(UUID playerId) {

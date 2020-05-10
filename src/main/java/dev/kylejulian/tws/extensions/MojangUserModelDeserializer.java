@@ -1,21 +1,19 @@
 package dev.kylejulian.tws.extensions;
 
-import java.io.IOException;
-import java.util.UUID;
-
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
-
 import dev.kylejulian.tws.data.entities.MojangUserModel;
+
+import java.io.IOException;
+import java.util.UUID;
 
 public class MojangUserModelDeserializer extends JsonDeserializer<MojangUserModel> {
 
 	@Override
-	public MojangUserModel deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+	public MojangUserModel deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
 		MojangUserModel user = new MojangUserModel();
 		ObjectCodec oc = p.getCodec();
 		JsonNode node = oc.readTree(p);

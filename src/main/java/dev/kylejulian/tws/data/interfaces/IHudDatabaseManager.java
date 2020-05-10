@@ -1,14 +1,16 @@
 package dev.kylejulian.tws.data.interfaces;
 
 import dev.kylejulian.tws.data.callbacks.BooleanQueryCallback;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
 public interface IHudDatabaseManager extends IDatabaseManager {
 
-    void isEnabled(final UUID playerId, final BooleanQueryCallback callback);
+    void isEnabled(@NotNull final UUID playerId, @Nullable final BooleanQueryCallback callback);
 
-    void removePlayer(final UUID playerId, final BooleanQueryCallback callback);
+    void removePlayer(@NotNull final UUID playerId, @Nullable final BooleanQueryCallback callback);
 
-    void addPlayer(final UUID playerId, final BooleanQueryCallback callback);
+    void addPlayer(@NotNull final UUID playerId, @Nullable final BooleanQueryCallback callback);
 }

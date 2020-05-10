@@ -1,8 +1,6 @@
 package dev.kylejulian.tws.commands;
 
-import dev.kylejulian.tws.data.callbacks.BooleanQueryCallback;
 import dev.kylejulian.tws.data.interfaces.IHudDatabaseManager;
-import dev.kylejulian.tws.player.hud.HudDisplayRunnable;
 import dev.kylejulian.tws.player.hud.events.HudEvent;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -10,7 +8,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -50,7 +47,7 @@ public class HudCommand implements CommandExecutor {
      * Raises a Event to trigger Hud event service
      *
      * @param playerId Player whom triggered the event
-     * @param enabled
+     * @param enabled To indicate if a player wants the Hud to be visible or not
      */
     private void raiseHudEvent(@NotNull final UUID playerId, final boolean enabled) {
         new BukkitRunnable() {

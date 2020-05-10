@@ -1,12 +1,9 @@
 package dev.kylejulian.tws.player.hud;
 
 import dev.kylejulian.tws.configuration.HudConfigModel;
-import dev.kylejulian.tws.data.callbacks.BooleanQueryCallback;
-import dev.kylejulian.tws.data.interfaces.IHudDatabaseManager;
 import dev.kylejulian.tws.player.hud.events.HudEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;

@@ -24,7 +24,11 @@ public class ConfigurationManager {
 	 */
 	public void reload() {
 		if (!this.file.getParentFile().exists()) {
-			this.file.getParentFile().mkdirs();
+			boolean makeDirectoryResult = this.file.getParentFile().mkdirs();
+			if (!makeDirectoryResult) {
+				this.plugin.getLogger().log(Level.WARNING, "Unable to make directory");
+				return;
+			}
 		}
 	
 		if (!this.file.exists()) {
