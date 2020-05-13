@@ -3,25 +3,8 @@
 		"timeMinutes": 1,
 		"kickTimeMinutes": 2,
 		"kickMessage": "You have been kicked for being AFK for too long!",
-		"playerCountNeededForKick": 1,
-		"events": [
-			"onPlayerChat",
-			"onPlayerInteractEntity",
-			"onPlayerInteract",
-			"onPlayerBedEnter",
-			"onPlayerChangedWorld",
-			"onPlayerEditBook",
-			"onPlayerDropItem",
-			"onPlayerItemBreak",
-			"onPlayerShearEntity",
-			"onPlayerToggleFlight",
-			"onPlayerToggleSprint",
-			"onPlayerToggleSneak",
-			"onPlayerUnleashEntity",
-			"onPlayerBucketFill",
-			"onPlayerBucketEmpty",
-			"onPlayerMove",
-			"onPlayerExpChange"
+		"playerCountNeededForKick": 25,
+		"events": ["onPlayerChat", "onPlayerInteractEntity", "onPlayerInteract", "onPlayerBedEnter", "onPlayerChangedWorld", "onPlayerEditBook", "onPlayerDropItem", "onPlayerItemBreak", "onPlayerShearEntity", "onPlayerToggleFlight", "onPlayerToggleSprint", "onPlayerToggleSneak", "onPlayerUnleashEntity", "onPlayerBucketFill", "onPlayerBucketEmpty", "onPlayerMove", "onPlayerExpChange"
 		]
 	},
 	"nightResetConfig": {
@@ -30,6 +13,11 @@
 	"hudConfig": {
 		"enabled": true,
 		"refreshRateTicks": 10
+	},
+	"whitelistConfig": {
+		"enabled": true,
+		"days": 14,
+		"hours": 0
 	},
 	"databaseConfig": {
 		"database": "tws-local.db",
