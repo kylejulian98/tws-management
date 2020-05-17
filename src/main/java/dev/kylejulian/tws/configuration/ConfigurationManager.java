@@ -111,7 +111,18 @@ public class ConfigurationManager {
             saveRequired = true;
         }
 
-        // Set default Database Configuration
+        // Set default Whitelist configuration
+        if (configModel.getWhitelistConfig() == null) {
+            WhitelistConfigModel whitelistConfigModel = new WhitelistConfigModel();
+            whitelistConfigModel.setEnabled(true);
+            whitelistConfigModel.setDays(14);
+            whitelistConfigModel.setHours(0);
+
+            configModel.setWhitelistConfig(whitelistConfigModel);
+            saveRequired = true;
+        }
+
+        // Set default Database configuration
         if (configModel.getDatabaseConfig() == null) {
             DatabaseConfigModel databaseConfigModel = new DatabaseConfigModel();
             databaseConfigModel.setDirectory(this.plugin.getDataFolder().getPath());

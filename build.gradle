@@ -12,6 +12,7 @@ shadowJar {
 
 repositories {
     jcenter()
+
     maven {
 		name = 'MinecraftPackages'
         url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
@@ -40,6 +41,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     
     compileOnly files('lib/TABv2.7.3.jar')
+    compileOnly 'net.luckperms:api:5.0'
     compileOnly 'org.jetbrains:annotations:19.0.0'
 
   	compileOnly 'org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT'

@@ -14,51 +14,59 @@ import dev.kylejulian.tws.data.sqlite.AfkDatabaseManager;
 import dev.kylejulian.tws.data.sqlite.HudDatabaseManager;
 import dev.kylejulian.tws.player.PlayerListener;
 import dev.kylejulian.tws.player.hud.HudListener;
+import dev.kylejulian.tws.server.whitelist.WhitelistRunnable;
 import dev.kylejulian.tws.world.DaytimeListener;
+import org.apache.commons.lang.NullArgumentException;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
+import java.util.logging.Level;
 
 public class ManagementPlugin extends JavaPlugin {
 
     private final ConfigurationManager configManager;
-    private final DatabaseConnectionManager databaseConnectionManager; 
-    
-    private final IAfkDatabaseManager afkDatabaseManager;
-    private final IHudDatabaseManager hudDatabaseManager;
+    private DatabaseConnectionManager databaseConnectionManager;
 
-    public ManagementPlugin() {
+	public ManagementPlugin() {
     	this.configManager = new ConfigurationManager(this, "config.json");
-    	this.configManager.reload();
-    	ConfigModel config = this.configManager.getConfig();
-    	DatabaseConfigModel databaseConfig = config.getDatabaseConfig(); 
-    	
-    	this.databaseConnectionManager = new DatabaseConnectionManager(databaseConfig);
-    	this.afkDatabaseManager = new AfkDatabaseManager(this, this.databaseConnectionManager);
-    	this.hudDatabaseManager = new HudDatabaseManager(this, this.databaseConnectionManager);
     }
 	
 	@Override
 	public void onEnable() {
+		this.configManager.reload();
+
 		ConfigModel config = this.configManager.getConfig();
+		DatabaseConfigModel databaseConfig = config.getDatabaseConfig();
 		AfkConfigModel afkConfig = config.getAfkConfig();
 		NightResetConfigModel nightResetConfig = config.getNightResetConfig();
 		HudConfigModel hudConfig = config.getHudConfig();
+		WhitelistConfigModel whitelistConfig = config.getWhitelistConfig();
 
-		runDefaultSchemaSetup(new IDatabaseManager[] { this.afkDatabaseManager, this.hudDatabaseManager } );
+		if (databaseConfig == null || afkConfig == null || nightResetConfig == null ||
+				hudConfig == null || whitelistConfig == null) {
+			this.getLogger().log(Level.SEVERE, "Failed start up. Unable to get configuration for plugin.");
+			return;
+		}
+
+		this.databaseConnectionManager = new DatabaseConnectionManager(databaseConfig);
+		IAfkDatabaseManager afkDatabaseManager = new AfkDatabaseManager(this, this.databaseConnectionManager);
+		IHudDatabaseManager hudDatabaseManager = new HudDatabaseManager(this, this.databaseConnectionManager);
+
+		runDefaultSchemaSetup(new IDatabaseManager[] {afkDatabaseManager, hudDatabaseManager} );
 		
-		this.getServer().getPluginManager().registerEvents(new PlayerListener(this, this.afkDatabaseManager,
-				this.hudDatabaseManager, this.configManager), this);
+		this.getServer().getPluginManager().registerEvents(new PlayerListener(this, afkDatabaseManager,
+				hudDatabaseManager, this.configManager), this);
 		this.getServer().getPluginManager().registerEvents(new AfkEventListener(this, afkConfig), this);
 		this.getServer().getPluginManager().registerEvents(new DaytimeListener(this, nightResetConfig), this);
 		this.getServer().getPluginManager().registerEvents(new HudListener(this, hudConfig), this);
+		this.getServer().getScheduler().runTaskTimerAsynchronously(this, new WhitelistRunnable(this, whitelistConfig), 0, 60);
 		
-		Objects.requireNonNull(this.getCommand("afk")).setExecutor(new AfkCommand(this, this.afkDatabaseManager, new MojangApi()));
+		Objects.requireNonNull(this.getCommand("afk")).setExecutor(new AfkCommand(this, afkDatabaseManager, new MojangApi()));
 		Objects.requireNonNull(this.getCommand("afk")).setTabCompleter(new AfkTabCompleter(this));
-		Objects.requireNonNull(this.getCommand("hud")).setExecutor(new HudCommand(this, this.hudDatabaseManager));
+		Objects.requireNonNull(this.getCommand("hud")).setExecutor(new HudCommand(this, hudDatabaseManager));
 	}
-	
+
 	@Override
 	public void onDisable() {
 		this.databaseConnectionManager.closeConnections();
