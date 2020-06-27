@@ -1,12 +1,12 @@
 package dev.kylejulian.tws.data;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
 import dev.kylejulian.tws.data.interfaces.IDatabaseManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
-import dev.kylejulian.tws.data.callbacks.BooleanQueryCallback;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
 
 public abstract class DatabaseManager implements IDatabaseManager {
 
@@ -20,37 +20,13 @@ public abstract class DatabaseManager implements IDatabaseManager {
 
 	/**
 	 * Setups the Default Database schema for the Database Manager
-	 * 
-	 * @param callback The result of the Query as a {@link BooleanQueryCallback}
-	 */
-	public abstract void setupDefaultSchema(final BooleanQueryCallback callback);
+	 *
+     * @return CompletableFuture<Void> which will setup the Database schema
+     */
+	public abstract @NotNull CompletableFuture<Void> setupDefaultSchema();
 
 	protected JavaPlugin getPlugin() {
 		return this.plugin;
-	}
-
-
-	protected void queueCallbackTaskSync(final BooleanQueryCallback callback, boolean result) {
-		final boolean callbackResult = result;
-		Runnable callbackTask = () -> callback.onQueryComplete(callbackResult);
-
-		this.executeQuerySync(callbackTask);
-	}
-
-	/**
-	 * Queues up a Runnable task on the Server Scheduler asynchronously
-	 * 
-	 */
-	protected void executeQueryAsync(Runnable runnable) {
-		this.getPlugin().getServer().getScheduler().runTaskAsynchronously(this.plugin, runnable);
-	}
-
-	/**
-	 * Queues up a Runnable task on the Server scheduler synchronously
-	 * 
-	 */
-	protected void executeQuerySync(Runnable runnable) {
-		this.getPlugin().getServer().getScheduler().runTask(this.plugin, runnable);
 	}
 
 	/**

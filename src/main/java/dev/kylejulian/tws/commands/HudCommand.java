@@ -7,10 +7,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class HudCommand implements CommandExecutor {
 
@@ -28,12 +28,17 @@ public class HudCommand implements CommandExecutor {
             Player player = (Player) sender;
             final UUID playerId = player.getUniqueId();
 
-            hudDatabaseManager.isEnabled(playerId, result -> {
+            CompletableFuture<Boolean> playerHudIsEnabledFuture = hudDatabaseManager.isEnabled(playerId);
+            playerHudIsEnabledFuture.thenAcceptAsync(result -> {
                 if (!result) {
-                    hudDatabaseManager.addPlayer(playerId, null);
+                    CompletableFuture<Void> enablePlayerHudFuture = hudDatabaseManager.addPlayer(playerId);
+                    enablePlayerHudFuture.join();
+
                     raiseHudEvent(playerId, true);
                 } else {
-                    hudDatabaseManager.removePlayer(playerId, null);
+                    CompletableFuture<Void> disablePlayerHudFuture = hudDatabaseManager.removePlayer(playerId);
+                    disablePlayerHudFuture.join();
+
                     raiseHudEvent(playerId, false);
                 }
             });
@@ -50,11 +55,7 @@ public class HudCommand implements CommandExecutor {
      * @param enabled To indicate if a player wants the Hud to be visible or not
      */
     private void raiseHudEvent(@NotNull final UUID playerId, final boolean enabled) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                plugin.getServer().getPluginManager().callEvent(new HudEvent(playerId, enabled));
-            }
-        }.runTask(this.plugin);
+        Runnable runnable = () -> plugin.getServer().getPluginManager().callEvent(new HudEvent(playerId, enabled));
+        this.plugin.getServer().getScheduler().runTask(this.plugin, runnable);
     }
 }

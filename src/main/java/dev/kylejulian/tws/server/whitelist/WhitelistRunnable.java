@@ -62,7 +62,7 @@ public class WhitelistRunnable implements Runnable {
             completableFutures.add(unwhitelistPlayerFuture);
         }
 
-        this.plugin.getLogger().log(Level.INFO, "Verifying " + completableFutures.size() + " Players for auto Unwhitelist!");
+        this.plugin.getLogger().log(Level.INFO, "Verifying {0} Players for auto Unwhitelist!", completableFutures.size());
         completableFutures.forEach(CompletableFuture::join);
     }
 
@@ -113,13 +113,15 @@ public class WhitelistRunnable implements Runnable {
                 LocalDateTime lastPlayDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(lastPlayTime), ZoneId.systemDefault());
                 long days = lastPlayDate.until(LocalDateTime.now(), ChronoUnit.DAYS);
                 if (lastPlayDate.isBefore(unwhitelistDate)) {
-                    this.plugin.getLogger().log(Level.INFO, "Player (" + whitelistedPlayer.getName() + ") has been unwhitelisted due to inactivity! Has been inactive for : " + days + " days!");
+                    this.plugin.getLogger().log(Level.INFO, "Player ({0}) has been unwhitelisted due to inactivity! Has been inactive for : {1} days!",
+                            new Object[] { whitelistedPlayer.getName(), days });
 
                     playerWhitelisted.setWhitelist(false);
                     return playerWhitelisted;
                 }
 
-                this.plugin.getLogger().log(Level.FINE, "Player (" + whitelistedPlayer.getName() + ") will not be unwhitelisted! Has been inactive for : " + days + " days!");
+                this.plugin.getLogger().log(Level.FINE, "Player ({0}) will not be unwhitelisted! Has been inactive for : {1} days!",
+                        new Object[] { whitelistedPlayer.getName(), days });
             }
 
             return playerWhitelisted;

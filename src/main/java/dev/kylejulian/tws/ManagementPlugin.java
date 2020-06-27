@@ -16,11 +16,12 @@ import dev.kylejulian.tws.player.PlayerListener;
 import dev.kylejulian.tws.player.hud.HudListener;
 import dev.kylejulian.tws.server.whitelist.WhitelistRunnable;
 import dev.kylejulian.tws.world.DaytimeListener;
-import org.apache.commons.lang.NullArgumentException;
+import org.apache.commons.lang.time.StopWatch;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 public class ManagementPlugin extends JavaPlugin {
@@ -34,7 +35,11 @@ public class ManagementPlugin extends JavaPlugin {
 	
 	@Override
 	public void onEnable() {
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
+
 		this.configManager.reload();
+		this.getLogger().log(Level.INFO, "Plugin Configuration has been loaded by {0}ms", stopWatch.getTime());
 
 		ConfigModel config = this.configManager.getConfig();
 		DatabaseConfigModel databaseConfig = config.getDatabaseConfig();
@@ -54,27 +59,45 @@ public class ManagementPlugin extends JavaPlugin {
 		IHudDatabaseManager hudDatabaseManager = new HudDatabaseManager(this, this.databaseConnectionManager);
 
 		runDefaultSchemaSetup(new IDatabaseManager[] {afkDatabaseManager, hudDatabaseManager} );
+
+		this.getLogger().log(Level.INFO, "Database schemas have been validated by {0}ms", stopWatch.getTime());
 		
 		this.getServer().getPluginManager().registerEvents(new PlayerListener(this, afkDatabaseManager,
 				hudDatabaseManager, this.configManager), this);
 		this.getServer().getPluginManager().registerEvents(new AfkEventListener(this, afkConfig), this);
 		this.getServer().getPluginManager().registerEvents(new DaytimeListener(this, nightResetConfig), this);
 		this.getServer().getPluginManager().registerEvents(new HudListener(this, hudConfig), this);
-		this.getServer().getScheduler().runTaskTimerAsynchronously(this, new WhitelistRunnable(this, whitelistConfig), 0, 60);
+
+		this.getLogger().log(Level.INFO, "Plugin Events have been registered by {0}ms", stopWatch.getTime());
+
+		this.getServer().getScheduler().runTaskTimerAsynchronously(this, new WhitelistRunnable(this, whitelistConfig), 0, 36000);
 		
-		Objects.requireNonNull(this.getCommand("afk")).setExecutor(new AfkCommand(this, afkDatabaseManager, new MojangApi()));
+		Objects.requireNonNull(this.getCommand("afk")).setExecutor(new AfkCommand(this, afkDatabaseManager, new MojangApi(this.getLogger())));
 		Objects.requireNonNull(this.getCommand("afk")).setTabCompleter(new AfkTabCompleter(this));
 		Objects.requireNonNull(this.getCommand("hud")).setExecutor(new HudCommand(this, hudDatabaseManager));
+
+		stopWatch.stop();
+		this.getLogger().log(Level.INFO, "Plugin started in {0}ms", stopWatch.getTime());
 	}
 
 	@Override
 	public void onDisable() {
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
+
 		this.databaseConnectionManager.closeConnections();
+		this.getLogger().log(Level.INFO, "All database connections have been closed in {0}ms", stopWatch.getTime());
+
+		stopWatch.stop();
+		this.getLogger().log(Level.INFO, "Plugin stopped in {0}ms", stopWatch.getTime());
 	}
 
 	private void runDefaultSchemaSetup(@NotNull IDatabaseManager[] databaseManagers) {
-    	for (IDatabaseManager databaseManager : databaseManagers) {
-    		databaseManager.setupDefaultSchema(null);
+		//noinspection unchecked
+		CompletableFuture<Void>[] completableFutures = new CompletableFuture[databaseManagers.length];
+    	for (int i = 0; i < databaseManagers.length; i++) {
+			completableFutures[i] = databaseManagers[i].setupDefaultSchema();
 		}
+    	CompletableFuture.allOf(completableFutures);
 	}
 }

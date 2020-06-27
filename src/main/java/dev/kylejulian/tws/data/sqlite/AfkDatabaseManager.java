@@ -1,22 +1,20 @@
 package dev.kylejulian.tws.data.sqlite;
 
+import dev.kylejulian.tws.data.DatabaseConnectionManager;
+import dev.kylejulian.tws.data.DatabaseManager;
+import dev.kylejulian.tws.data.entities.AfkKickExemptList;
+import dev.kylejulian.tws.data.interfaces.IAfkDatabaseManager;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
-
-import dev.kylejulian.tws.data.DatabaseConnectionManager;
-import dev.kylejulian.tws.data.DatabaseManager;
-import dev.kylejulian.tws.data.interfaces.IAfkDatabaseManager;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import dev.kylejulian.tws.data.callbacks.AfkKickExemptListQueryCallback;
-import dev.kylejulian.tws.data.callbacks.BooleanQueryCallback;
-import dev.kylejulian.tws.data.entities.AfkKickExemptList;
-import org.jetbrains.annotations.NotNull;
 
 public class AfkDatabaseManager extends DatabaseManager implements IAfkDatabaseManager {
 
@@ -25,17 +23,15 @@ public class AfkDatabaseManager extends DatabaseManager implements IAfkDatabaseM
 	}
 
 	@Override
-	public void setupDefaultSchema(final BooleanQueryCallback callback) {
+	public @NotNull CompletableFuture<Void> setupDefaultSchema() {
 		final String sqlCommand = "CREATE TABLE IF NOT EXISTS afk_kick_exempt (id INTEGER PRIMARY KEY NOT NULL, player_uuid UUID NOT NULL)";
 		final String sqlIndexCommand = "CREATE UNIQUE INDEX IF NOT EXISTS idx_afk_kick_exempt_id ON afk_kick_exempt (id)";
 		final String sqlPlayerIdIndexCommand = "CREATE UNIQUE INDEX IF NOT EXISTS idx_afk_kick_exempt_player_uuid ON afk_kick_exempt (player_uuid)";
 
-		Runnable task = () -> {
-			boolean result = false;
-
+		return CompletableFuture.runAsync(() -> {
 			try (Connection connection = this.getConnection();
 					PreparedStatement statement = connection.prepareStatement(sqlCommand)) {
-				result = statement.execute();
+				statement.execute();
 			} catch (SQLException e) {
 				this.getPlugin().getLogger().log(Level.WARNING,
 						"Unable to setup Default Schema for AFK Database table.");
@@ -45,96 +41,68 @@ public class AfkDatabaseManager extends DatabaseManager implements IAfkDatabaseM
 			try (Connection connection = this.getConnection();
 				 PreparedStatement indexStatement = connection.prepareStatement(sqlIndexCommand);
 				 PreparedStatement indexPlayerIdStatement = connection.prepareStatement(sqlPlayerIdIndexCommand)) {
-				boolean indexResult = indexStatement.execute();
-				boolean playerIdIndexResult = indexPlayerIdStatement.execute();
-				result = result && indexResult && playerIdIndexResult;
+				indexStatement.execute();
+				indexPlayerIdStatement.execute();
 			} catch (SQLException e) {
 				this.getPlugin().getLogger().log(Level.WARNING,
 						"Unable to setup Default Indexes for AFK Database table.");
 				this.getPlugin().getLogger().log(Level.WARNING, e.getMessage());
 			}
-
-			if (callback != null) {
-				queueCallbackTaskSync(callback, result);
-			}
-		};
-
-		this.executeQueryAsync(task);
+		});
 	}
 
 	/**
 	 * Adds a specified Player to the exempt list
-	 * 
-	 * @param callback The result of the Query as a {@link BooleanQueryCallback}
+	 *
 	 * @param playerId Player to remove from the Exempt list
 	 */
 	@Override
-	public void addPlayer(final @NotNull UUID playerId, final BooleanQueryCallback callback) {
+	public @NotNull CompletableFuture<Void> addPlayer(final @NotNull UUID playerId) {
 		final String sqlCommand = "INSERT INTO afk_kick_exempt (player_uuid) VALUES (?)";
 
-		Runnable task = () -> {
-			boolean result = false;
-
+		return CompletableFuture.runAsync(() -> {
 			try (Connection connection = this.getConnection();
 					PreparedStatement statement = connection.prepareStatement(sqlCommand)) {
 				statement.setObject(1, playerId);
-
-				result = statement.execute();
+				statement.execute();
 			} catch (SQLException e) {
 				this.getPlugin().getLogger().log(Level.WARNING, "Unable to execute query for AFK kick check.");
 				this.getPlugin().getLogger().log(Level.WARNING, e.getMessage());
 			}
-
-			if (callback != null) {
-				queueCallbackTaskSync(callback, result);
-			}
-		};
-
-		this.executeQueryAsync(task);
+		});
 	}
 
 	/**
 	 * Removes a specified Player to the exempt list
-	 * 
-	 * @param callback The result of the Query as a {@link BooleanQueryCallback}
+	 *
 	 * @param playerId Player to remove from the Exempt list
 	 */
 	@Override
-	public void removePlayer(final @NotNull UUID playerId, final BooleanQueryCallback callback) {
+	public @NotNull CompletableFuture<Void> removePlayer(final @NotNull UUID playerId) {
 		final String sqlCommand = "DELETE FROM afk_kick_exempt WHERE player_uuid = ?";
 
-		Runnable task = () -> {
-			boolean result = false;
-
+		return CompletableFuture.runAsync(() -> {
 			try (Connection connection = this.getConnection();
 					PreparedStatement statement = connection.prepareStatement(sqlCommand)) {
 				statement.setObject(1, playerId);
-
-				result = statement.execute();
+				statement.execute();
 			} catch (SQLException e) {
 				this.getPlugin().getLogger().log(Level.WARNING, "Unable to execute query for AFK kick check.");
 				this.getPlugin().getLogger().log(Level.WARNING, e.getMessage());
 			}
-
-			if (callback != null) {
-				queueCallbackTaskSync(callback, result);
-			}
-		};
-
-		this.executeQueryAsync(task);
+		});
 	}
 
 	/**
 	 * Returns whether or not a Player is exempt from being kicked due to inactivity
 	 * 
 	 * @param playerId Player to lookup
-	 * @param callback The result of the Query as a {@link BooleanQueryCallback}
 	 */
 	@Override
-	public void isKickExempt(final @NotNull UUID playerId, final BooleanQueryCallback callback) {
+	public @NotNull CompletableFuture<Boolean> isKickExempt(final @NotNull UUID playerId) {
 		final String sqlCommand = "SELECT id FROM afk_kick_exempt WHERE player_uuid=?";
 
-		Runnable task = () -> {
+		return CompletableFuture.supplyAsync(() -> {
 			boolean result = false;
 			ResultSet set = null;
 
@@ -163,28 +131,23 @@ public class AfkDatabaseManager extends DatabaseManager implements IAfkDatabaseM
 				}
 			}
 
-			if (callback != null) {
-				queueCallbackTaskSync(callback, result);
-			}
-		};
-
-		this.executeQueryAsync(task);
+			return result;
+		});
 	}
 	
 	/**
 	 * Gets a list of all AFK Kick Exempt Players
 	 * @param pageIndex What page to start at. Should always be greater than 1.
 	 * @param pageSize Number of results to be returned
-	 * @param callback The result of the Query as a {@link AfkKickExemptListQueryCallback}
 	 */
 	@Override
-	public void getPlayers(final int pageIndex, final int pageSize, final @NotNull AfkKickExemptListQueryCallback callback) {
+	public @NotNull CompletableFuture<AfkKickExemptList> getPlayers(final int pageIndex, final int pageSize) {
 		final String sqlCommand = "SELECT * FROM afk_kick_exempt LIMIT ? OFFSET ?";
 		final String sqlCountCommand = "SELECT COUNT(*) FROM afk_kick_exempt";
 		int offset = pageSize * (pageIndex - 1);
 		this.getPlugin().getLogger().log(Level.FINE, "Offset for Pagination is [" + offset + "].");
-		
-		Runnable task = () -> {
+
+		return CompletableFuture.supplyAsync(() -> {
 			AfkKickExemptList result = new AfkKickExemptList();
 			ArrayList<UUID> playerIds = new ArrayList<>();
 			ResultSet set = null;
@@ -242,18 +205,7 @@ public class AfkDatabaseManager extends DatabaseManager implements IAfkDatabaseM
 			
 			result.setPlayerIds(playerIds);
 
-			if (callback != null) {
-				queueCallbackTaskSync(callback, result);
-			}
-		};
-
-		this.executeQueryAsync(task);
-	}
-
-	private void queueCallbackTaskSync(final AfkKickExemptListQueryCallback callback, AfkKickExemptList result) {
-		final AfkKickExemptList callbackResult = result;
-		Runnable callbackTask = () -> callback.onQueryComplete(callbackResult);
-
-		this.executeQuerySync(callbackTask);
+			return result;
+		});
 	}
 }

@@ -1,9 +1,10 @@
 package dev.kylejulian.tws.data.interfaces;
 
-import dev.kylejulian.tws.data.callbacks.BooleanQueryCallback;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.concurrent.CompletableFuture;
 
 public interface IDatabaseManager {
 
-    void setupDefaultSchema(final @Nullable BooleanQueryCallback callback);
+    @NotNull CompletableFuture<Void> setupDefaultSchema();
 }

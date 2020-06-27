@@ -1,11 +1,8 @@
 package dev.kylejulian.tws.server;
 
 import net.luckperms.api.LuckPerms;
-import net.luckperms.api.cacheddata.CachedDataManager;
 import net.luckperms.api.cacheddata.CachedPermissionData;
-import net.luckperms.api.context.Context;
 import net.luckperms.api.context.ContextManager;
-import net.luckperms.api.context.ImmutableContextSet;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.model.user.UserManager;
 import net.luckperms.api.query.QueryOptions;
@@ -39,7 +36,7 @@ public class LuckPermsHelper {
                 return userCachedPermissions.checkPermission(node).asBoolean();
             }
 
-            this.plugin.getLogger().log(Level.WARNING, "Unable to find Player [" + playerId + "] with the LuckPerms Api");
+            this.plugin.getLogger().log(Level.WARNING, "Unable to find Player [{0}] with the LuckPerms Api", playerId);
             return false;
         });
     }

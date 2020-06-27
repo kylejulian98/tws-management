@@ -2,6 +2,7 @@ package dev.kylejulian.tws.player;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import dev.kylejulian.tws.data.interfaces.IAfkDatabaseManager;
 import dev.kylejulian.tws.data.interfaces.IHudDatabaseManager;
@@ -50,11 +51,15 @@ public class PlayerListener implements Listener {
 
 		this.playerAfkManagerTasks.put(playerId, taskId);
 
-		this.hudDatabaseManager.isEnabled(playerId, result -> {
+		CompletableFuture<Boolean> isHudEnabledFuture = this.hudDatabaseManager.isEnabled(playerId);
+		CompletableFuture<Void> raiseHudEventFuture = isHudEnabledFuture.thenAcceptAsync(result -> {
 			if (result) {
-				plugin.getServer().getPluginManager().callEvent(new HudEvent(playerId, true));
+				// Raise Hud Event synchronously
+				plugin.getServer().getScheduler().runTask(plugin, () ->
+						plugin.getServer().getPluginManager().callEvent(new HudEvent(playerId, true)));
 			}
 		});
+		raiseHudEventFuture.join();
 	}
 
 	@EventHandler
@@ -118,9 +123,9 @@ public class PlayerListener implements Listener {
 		ConfigModel config = this.configManager.getConfig();
 		AfkConfigModel afkConfig = config.getAfkConfig();
 		
-		AfkManager playerAfkManager = new AfkManager(this.plugin, this.afkDatabaseManager, afkConfig, playerId, alreadyAfk);
-		BukkitTask afkTimerTask = playerAfkManager
-				.runTaskTimerAsynchronously(plugin, 1200, 1200); // 1200 ticks = 60 seconds
+		Runnable playerAfkManager = new AfkManager(this.plugin, this.afkDatabaseManager, afkConfig, playerId, alreadyAfk);
+		BukkitTask afkTimerTask = this.plugin.getServer().getScheduler()
+				.runTaskTimerAsynchronously(this.plugin, playerAfkManager, 1200, 1200); // 1200 ticks = 60 seconds
 		
 		return afkTimerTask.getTaskId();
 	}

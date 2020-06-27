@@ -1,19 +1,18 @@
 package dev.kylejulian.tws.data.interfaces;
 
-import dev.kylejulian.tws.data.callbacks.AfkKickExemptListQueryCallback;
-import dev.kylejulian.tws.data.callbacks.BooleanQueryCallback;
+import dev.kylejulian.tws.data.entities.AfkKickExemptList;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public interface IAfkDatabaseManager extends IDatabaseManager {
 
-    void addPlayer(@NotNull final UUID playerId, @Nullable final BooleanQueryCallback callback);
+    @NotNull CompletableFuture<Void> addPlayer(@NotNull final UUID playerId);
 
-    void removePlayer(@NotNull final UUID playerId, @Nullable final BooleanQueryCallback callback);
+    @NotNull CompletableFuture<Void> removePlayer(@NotNull final UUID playerId);
 
-    void isKickExempt(@NotNull final UUID playerId, @Nullable final BooleanQueryCallback callback);
+    @NotNull CompletableFuture<Boolean> isKickExempt(@NotNull final UUID playerId);
 
-    void getPlayers(final int pageIndex, final int pageSize, @NotNull final AfkKickExemptListQueryCallback callback);
+    @NotNull CompletableFuture<AfkKickExemptList> getPlayers(final int pageIndex, final int pageSize);
 }

@@ -1,24 +1,21 @@
 package dev.kylejulian.tws.afk;
 
-import java.util.UUID;
-
+import dev.kylejulian.tws.afk.events.AfkEvent;
+import dev.kylejulian.tws.configuration.AfkConfigModel;
 import dev.kylejulian.tws.data.interfaces.IAfkDatabaseManager;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import dev.kylejulian.tws.afk.events.AfkEvent;
-import dev.kylejulian.tws.configuration.AfkConfigModel;
-import dev.kylejulian.tws.data.sqlite.AfkDatabaseManager;
-import dev.kylejulian.tws.data.callbacks.BooleanQueryCallback;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * 
  * Manages the AFK for a given player
  *
  */
-public class AfkManager extends BukkitRunnable {
+public class AfkManager implements Runnable {
 
 	private int afkMinutes;
 	private final boolean alreadyAfk;
@@ -26,18 +23,7 @@ public class AfkManager extends BukkitRunnable {
 	private final IAfkDatabaseManager afkDatabase;
 	private final AfkConfigModel afkConfig;
 	private final UUID playerId;
-	
-	/**
-	 * Creates a new AfkManager for a given Player
-	 * @param plugin JavaPlugin
-	 * @param afkDatabase AFK Database Manager
-	 * @param afkConfig Configuration for AFK
-	 * @param playerId Player whom this AFK Manager belongs to
-	 */
-	public AfkManager(JavaPlugin plugin, AfkDatabaseManager afkDatabase, AfkConfigModel afkConfig, UUID playerId) {
-		this(plugin, afkDatabase, afkConfig, playerId, false);
-	}
-	
+
 	/**
 	 * Creates a new AfkManager for a given Player
 	 * @param plugin JavaPlugin
@@ -74,19 +60,19 @@ public class AfkManager extends BukkitRunnable {
 				this.plugin.getServer().getPluginManager().callEvent(event);
 			});
 		}
-		
-		BooleanQueryCallback callback = result -> {
+
+		CompletableFuture<Boolean> isPlayerAfkKickExemptFuture = this.afkDatabase.isKickExempt(playerId);
+		CompletableFuture<Void> kickPlayerFuture = isPlayerAfkKickExemptFuture.thenAcceptAsync(result -> {
 			if (!result) { // Player is not Kick exempt
-				if (canKickPlayer(player, afkKickTime, afkTime)) {
-					player.kickPlayer(afkConfig.getKickMessage());
+				if (canKickPlayer(afkKickTime, afkTime)) {
+					// Player must be kicked synchronously
+					plugin.getServer().getScheduler().runTask(this.plugin, () -> player.kickPlayer(afkConfig.getKickMessage()));
 				}
 			}
-		};
-		
-		this.afkDatabase.isKickExempt(playerId, callback);
+		});
 	}
 	
-	private boolean canKickPlayer(Player player, int afkKickTime, int afkTime) {
+	private boolean canKickPlayer(int afkKickTime, int afkTime) {
 		if (this.getPlayerAfkMinutes() >= (afkKickTime + afkTime)) { // Player has to be inactive for both the AFK time and AFK Kick time
 			int numberOfPlayersOnline = this.plugin.getServer().getOnlinePlayers().size(); 
 			int numberOfRequiredPlayersToKick = this.afkConfig.getPlayerCountNeededForKick();
