@@ -93,8 +93,7 @@ public class ManagementPlugin extends JavaPlugin {
 	}
 
 	private void runDefaultSchemaSetup(@NotNull IDatabaseManager[] databaseManagers) {
-		//noinspection unchecked
-		CompletableFuture<Void>[] completableFutures = new CompletableFuture[databaseManagers.length];
+		CompletableFuture<?>[] completableFutures = new CompletableFuture<?>[databaseManagers.length];
     	for (int i = 0; i < databaseManagers.length; i++) {
 			completableFutures[i] = databaseManagers[i].setupDefaultSchema();
 		}
