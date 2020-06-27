@@ -2,7 +2,6 @@ package dev.kylejulian.tws.server.whitelist;
 
 import dev.kylejulian.tws.configuration.WhitelistConfigModel;
 import dev.kylejulian.tws.server.LuckPermsHelper;
-import net.luckperms.api.LuckPerms;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -13,7 +12,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -43,10 +41,11 @@ public class WhitelistRunnable implements Runnable {
 
         LuckPermsHelper luckPermsHelper = getLuckPermsHelper();
         Set<OfflinePlayer> whitelistedPlayers = this.plugin.getServer().getWhitelistedPlayers();
-        Set<CompletableFuture<Void>> completableFutures = new HashSet<>();
+        CompletableFuture<?>[] completableFutures = new CompletableFuture<?>[whitelistedPlayers.size()];
 
-        for (OfflinePlayer whitelistedPlayer : whitelistedPlayers) {
-            UUID playerId = whitelistedPlayer.getUniqueId();
+        OfflinePlayer[] whitelistedPlayersArray = whitelistedPlayers.toArray(new OfflinePlayer[0]);
+        for (int i = 0; i < whitelistedPlayers.size(); i++) {
+            UUID playerId = whitelistedPlayersArray[i].getUniqueId();
 
             CompletableFuture<Boolean> playerHasPermissionFuture;
 
@@ -56,21 +55,23 @@ public class WhitelistRunnable implements Runnable {
                 playerHasPermissionFuture = CompletableFuture.supplyAsync(() -> false); // We return false to indicate the player is not exempt
             }
 
-            CompletableFuture<PlayerWhitelisted> playerToBeUnwhitelistedFuture = getVerifyWhitelistedPlayerFuture(unwhitelistDate, whitelistedPlayer, playerHasPermissionFuture);
+            CompletableFuture<PlayerWhitelisted> playerToBeUnwhitelistedFuture =
+                    getVerifyWhitelistedPlayerFuture(unwhitelistDate, whitelistedPlayersArray[i], playerHasPermissionFuture);
             CompletableFuture<Void> unwhitelistPlayerFuture = getPlayerNeedsToUnwhitelistedFuture(playerToBeUnwhitelistedFuture);
-
-            completableFutures.add(unwhitelistPlayerFuture);
+            completableFutures[i] = unwhitelistPlayerFuture;
         }
 
-        this.plugin.getLogger().log(Level.INFO, "Verifying {0} Players for auto Unwhitelist!", completableFutures.size());
-        completableFutures.forEach(CompletableFuture::join);
+        this.plugin.getLogger().log(Level.INFO, "Verifying {0} Players for auto Unwhitelist!", completableFutures.length);
+
+        CompletableFuture.allOf(completableFutures);
     }
 
     private @Nullable LuckPermsHelper getLuckPermsHelper() {
         LuckPermsHelper luckPermsHelper = null;
         try {
-            RegisteredServiceProvider<LuckPerms> provider =
-                    this.plugin.getServer().getServicesManager().getRegistration(LuckPerms.class);
+            // Fully qualified names as to avoid issues creating the class when LP isn't deployed with this plugin
+            RegisteredServiceProvider<net.luckperms.api.LuckPerms> provider =
+                    this.plugin.getServer().getServicesManager().getRegistration(net.luckperms.api.LuckPerms.class);
 
             if (provider != null) { // Luck Perms is enabled
                 luckPermsHelper = new LuckPermsHelper(this.plugin, provider.getProvider());
@@ -94,7 +95,8 @@ public class WhitelistRunnable implements Runnable {
         });
     }
 
-    private @NotNull CompletableFuture<PlayerWhitelisted> getVerifyWhitelistedPlayerFuture(@NotNull LocalDateTime unwhitelistDate, @NotNull OfflinePlayer whitelistedPlayer,
+    private @NotNull CompletableFuture<PlayerWhitelisted> getVerifyWhitelistedPlayerFuture(@NotNull LocalDateTime unwhitelistDate,
+                                                                                           @NotNull OfflinePlayer whitelistedPlayer,
                                                                                            @NotNull CompletableFuture<Boolean> future) {
         return future.thenApplyAsync(result -> {
             PlayerWhitelisted playerWhitelisted = new PlayerWhitelisted(whitelistedPlayer.getUniqueId(), true);

@@ -58,6 +58,8 @@ public class ManagementPlugin extends JavaPlugin {
 		IAfkDatabaseManager afkDatabaseManager = new AfkDatabaseManager(this, this.databaseConnectionManager);
 		IHudDatabaseManager hudDatabaseManager = new HudDatabaseManager(this, this.databaseConnectionManager);
 
+		this.getLogger().log(Level.INFO, "Internal dependencies have been created by {0}ms", stopWatch.getTime());
+
 		runDefaultSchemaSetup(new IDatabaseManager[] {afkDatabaseManager, hudDatabaseManager} );
 
 		this.getLogger().log(Level.INFO, "Database schemas have been validated by {0}ms", stopWatch.getTime());
