@@ -9,11 +9,11 @@ Plugin to provide management functionalities for Minecraft servers. Specifically
 This plugin has a variety of bespoke features intended for the use of TWS Server. The features are listed below:
 
 - Ability to go afk
-  - Players automatically go afk after not triggering certain events [config.json](https://github.com/kylejulian98/tws.management/blob/improve-readme/src/main/resources/config.json#L7))
+  - Players automatically go afk after not triggering certain events [config.json](https://github.com/kylejulian98/tws.management/blob/master/src/main/resources/config.json#L7))
   - Player can manually go afk through:
     - `/afk`
   - AFK players are shown as AFK in the tab menu (if you have the TAB plugin installed, [see below](README.md#Requirements))
-- Ability to kick an afk player after a configurable [config.json](https://github.com/kylejulian98/tws.management/blob/improve-readme/src/main/resources/config.json#L4) of time
+- Ability to kick an afk player after a configurable [config.json](https://github.com/kylejulian98/tws.management/blob/master/src/main/resources/config.json#L4) of time
 - Ability to add Players to an AFK Kick exempt list, stored in a local SQLite database - The in-game commands for this feature are listed below:
     - `/afk exempt list`
     - `/afk exempt add <PlayerName>`
@@ -27,7 +27,7 @@ This plugin has a variety of bespoke features intended for the use of TWS Server
   - To activate the HUD players can use the following command:
     - `/hud`
   - Players who have enabled the HUD are stored in a local SQLite database
-- Add automatic unwhitelisting of players who are inactive for a configurable [config.json](https://github.com/kylejulian98/tws.management/blob/improve-readme/src/main/resources/config.json#L17) amount of days and hours.
+- Add automatic unwhitelisting of players who are inactive for a configurable [config.json](https://github.com/kylejulian98/tws.management/blob/master/src/main/resources/config.json#L17) amount of days and hours.
   - If a player is inactive for more than the combined duration (days + hours) they will be removed from the server whitelist
 
 This plugin maintains a local SQLite database which persists information used by some of the provided features. This is found under: `/plugins/tws.management/tws-local.db`.
