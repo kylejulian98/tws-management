@@ -15,7 +15,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 shadowJar {
 	archiveBaseName = 'TWSManagement'
 	archiveClassifier = null
-	archiveVersion = '0.0.4'
+	archiveVersion = '0.0.2'
 }
 
 repositories {
@@ -71,7 +71,7 @@ publishing {
         shadow(MavenPublication) { publication ->
             groupId = 'dev.kylejulian.tws'
             artifactId = 'TWSManagement'
-            version = '0.0.4'
+            version = '0.0.2'
             project.shadow.component(publication)
         }
     }
