@@ -24,10 +24,31 @@ public class AfkDatabaseManager extends DatabaseManager implements IExemptDataba
 
 	@Override
 	public @NotNull CompletableFuture<Void> setupDefaultSchema() {
-		return this
-				.execute("CREATE TABLE IF NOT EXISTS afk_kick_exempt (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, player_uuid UUID NOT NULL)", null)
-				.thenCompose(aVoid -> this.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_afk_kick_exempt_id ON afk_kick_exempt (id)", null))
-				.thenCompose(aVoid -> this.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_afk_kick_exempt_player_uuid ON afk_kick_exempt (player_uuid)", null));
+		final String sqlCommand = "CREATE TABLE IF NOT EXISTS afk_kick_exempt (id INTEGER PRIMARY KEY NOT NULL, player_uuid UUID NOT NULL)";
+		final String sqlIndexCommand = "CREATE UNIQUE INDEX IF NOT EXISTS idx_afk_kick_exempt_id ON afk_kick_exempt (id)";
+		final String sqlPlayerIdIndexCommand = "CREATE UNIQUE INDEX IF NOT EXISTS idx_afk_kick_exempt_player_uuid ON afk_kick_exempt (player_uuid)";
+
+		return CompletableFuture.runAsync(() -> {
+			try (Connection connection = this.getConnection();
+					PreparedStatement statement = connection.prepareStatement(sqlCommand)) {
+				statement.execute();
+			} catch (SQLException e) {
+				this.getPlugin().getLogger().log(Level.WARNING,
+						"Unable to setup Default Schema for AFK Database table.");
+				this.getPlugin().getLogger().log(Level.WARNING, e.getMessage());
+			}
+
+			try (Connection connection = this.getConnection();
+				 PreparedStatement indexStatement = connection.prepareStatement(sqlIndexCommand);
+				 PreparedStatement indexPlayerIdStatement = connection.prepareStatement(sqlPlayerIdIndexCommand)) {
+				indexStatement.execute();
+				indexPlayerIdStatement.execute();
+			} catch (SQLException e) {
+				this.getPlugin().getLogger().log(Level.WARNING,
+						"Unable to setup Default Indexes for AFK Database table.");
+				this.getPlugin().getLogger().log(Level.WARNING, e.getMessage());
+			}
+		});
 	}
 
 	/**
@@ -37,7 +58,18 @@ public class AfkDatabaseManager extends DatabaseManager implements IExemptDataba
 	 */
 	@Override
 	public @NotNull CompletableFuture<Void> add(final @NotNull UUID playerId) {
-		return this.execute("INSERT INTO afk_kick_exempt (player_uuid) VALUES (?)", new Object[]{ playerId });
+		final String sqlCommand = "INSERT INTO afk_kick_exempt (player_uuid) VALUES (?)";
+
+		return CompletableFuture.runAsync(() -> {
+			try (Connection connection = this.getConnection();
+					PreparedStatement statement = connection.prepareStatement(sqlCommand)) {
+				statement.setObject(1, playerId);
+				statement.execute();
+			} catch (SQLException e) {
+				this.getPlugin().getLogger().log(Level.WARNING, "Unable to execute query for AFK kick check.");
+				this.getPlugin().getLogger().log(Level.WARNING, e.getMessage());
+			}
+		});
 	}
 
 	/**
@@ -47,7 +79,18 @@ public class AfkDatabaseManager extends DatabaseManager implements IExemptDataba
 	 */
 	@Override
 	public @NotNull CompletableFuture<Void> remove(final @NotNull UUID playerId) {
-		return this.execute("DELETE FROM afk_kick_exempt WHERE player_uuid = ?", new Object[]{ playerId });
+		final String sqlCommand = "DELETE FROM afk_kick_exempt WHERE player_uuid = ?";
+
+		return CompletableFuture.runAsync(() -> {
+			try (Connection connection = this.getConnection();
+					PreparedStatement statement = connection.prepareStatement(sqlCommand)) {
+				statement.setObject(1, playerId);
+				statement.execute();
+			} catch (SQLException e) {
+				this.getPlugin().getLogger().log(Level.WARNING, "Unable to execute query for AFK kick check.");
+				this.getPlugin().getLogger().log(Level.WARNING, e.getMessage());
+			}
+		});
 	}
 
 	/**
@@ -57,7 +100,39 @@ public class AfkDatabaseManager extends DatabaseManager implements IExemptDataba
 	 */
 	@Override
 	public @NotNull CompletableFuture<Boolean> isExempt(final @NotNull UUID playerId) {
-		return this.exists("SELECT id FROM afk_kick_exempt WHERE player_uuid=?", new Object[]{ playerId });
+		final String sqlCommand = "SELECT id FROM afk_kick_exempt WHERE player_uuid=?";
+
+		return CompletableFuture.supplyAsync(() -> {
+			boolean result = false;
+			ResultSet set = null;
+
+			try (Connection connection = this.getConnection();
+					PreparedStatement statement = connection.prepareStatement(sqlCommand)) {
+				statement.setObject(1, playerId);
+
+				set = statement.executeQuery();
+				int count = 0; // Should only ever be 1
+
+				while (set.next()) {
+					count++;
+				}
+
+				result = count == 1;
+			} catch (SQLException e) {
+				this.getPlugin().getLogger().log(Level.WARNING, "Unable to execute query for AFK kick check.");
+				this.getPlugin().getLogger().log(Level.WARNING, e.getMessage());
+			} finally {
+				if (set != null) {
+					try {
+						set.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+
+			return result;
+		});
 	}
 	
 	/**
