@@ -2,8 +2,8 @@ package dev.kylejulian.tws.data.sqlite;
 
 import dev.kylejulian.tws.data.DatabaseConnectionManager;
 import dev.kylejulian.tws.data.DatabaseManager;
-import dev.kylejulian.tws.data.entities.AfkKickExemptList;
-import dev.kylejulian.tws.data.interfaces.IAfkDatabaseManager;
+import dev.kylejulian.tws.data.entities.EntityExemptList;
+import dev.kylejulian.tws.data.interfaces.IExemptDatabaseManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,7 +16,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
-public class AfkDatabaseManager extends DatabaseManager implements IAfkDatabaseManager {
+public class AfkDatabaseManager extends DatabaseManager implements IExemptDatabaseManager {
 
 	public AfkDatabaseManager(JavaPlugin plugin, DatabaseConnectionManager databaseConnectionManager) {
 		super(plugin, databaseConnectionManager);
@@ -57,7 +57,7 @@ public class AfkDatabaseManager extends DatabaseManager implements IAfkDatabaseM
 	 * @param playerId Player to remove from the Exempt list
 	 */
 	@Override
-	public @NotNull CompletableFuture<Void> addPlayer(final @NotNull UUID playerId) {
+	public @NotNull CompletableFuture<Void> add(final @NotNull UUID playerId) {
 		final String sqlCommand = "INSERT INTO afk_kick_exempt (player_uuid) VALUES (?)";
 
 		return CompletableFuture.runAsync(() -> {
@@ -78,7 +78,7 @@ public class AfkDatabaseManager extends DatabaseManager implements IAfkDatabaseM
 	 * @param playerId Player to remove from the Exempt list
 	 */
 	@Override
-	public @NotNull CompletableFuture<Void> removePlayer(final @NotNull UUID playerId) {
+	public @NotNull CompletableFuture<Void> remove(final @NotNull UUID playerId) {
 		final String sqlCommand = "DELETE FROM afk_kick_exempt WHERE player_uuid = ?";
 
 		return CompletableFuture.runAsync(() -> {
@@ -99,7 +99,7 @@ public class AfkDatabaseManager extends DatabaseManager implements IAfkDatabaseM
 	 * @param playerId Player to lookup
 	 */
 	@Override
-	public @NotNull CompletableFuture<Boolean> isKickExempt(final @NotNull UUID playerId) {
+	public @NotNull CompletableFuture<Boolean> isExempt(final @NotNull UUID playerId) {
 		final String sqlCommand = "SELECT id FROM afk_kick_exempt WHERE player_uuid=?";
 
 		return CompletableFuture.supplyAsync(() -> {
@@ -141,14 +141,14 @@ public class AfkDatabaseManager extends DatabaseManager implements IAfkDatabaseM
 	 * @param pageSize Number of results to be returned
 	 */
 	@Override
-	public @NotNull CompletableFuture<AfkKickExemptList> getPlayers(final int pageIndex, final int pageSize) {
+	public @NotNull CompletableFuture<EntityExemptList> getPlayers(final int pageIndex, final int pageSize) {
 		final String sqlCommand = "SELECT * FROM afk_kick_exempt LIMIT ? OFFSET ?";
 		final String sqlCountCommand = "SELECT COUNT(*) FROM afk_kick_exempt";
 		int offset = pageSize * (pageIndex - 1);
 		this.getPlugin().getLogger().log(Level.FINE, "Offset for Pagination is [" + offset + "].");
 
 		return CompletableFuture.supplyAsync(() -> {
-			AfkKickExemptList result = new AfkKickExemptList();
+			EntityExemptList result = new EntityExemptList();
 			ArrayList<UUID> playerIds = new ArrayList<>();
 			ResultSet set = null;
 			ResultSet countSet = null;
@@ -173,7 +173,7 @@ public class AfkDatabaseManager extends DatabaseManager implements IAfkDatabaseM
 				while (countSet.next()) {
 					int count = countSet.getInt(1);
 					int maxPages =  (int) Math.ceil(count / (double) pageSize);
-					result.setPageCount(maxPages);
+					result.setMaxPageCount(maxPages);
 				}
 				
 			} catch (SQLException e) {
