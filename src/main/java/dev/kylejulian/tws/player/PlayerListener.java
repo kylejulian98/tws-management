@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import dev.kylejulian.tws.data.interfaces.IAfkDatabaseManager;
+import dev.kylejulian.tws.data.interfaces.IExemptDatabaseManager;
 import dev.kylejulian.tws.data.interfaces.IHudDatabaseManager;
 import dev.kylejulian.tws.player.hud.events.HudEvent;
 import org.bukkit.ChatColor;
@@ -29,12 +29,12 @@ import org.jetbrains.annotations.NotNull;
 public class PlayerListener implements Listener {
 
 	private final JavaPlugin plugin;
-	private final IAfkDatabaseManager afkDatabaseManager;
+	private final IExemptDatabaseManager afkDatabaseManager;
 	private final IHudDatabaseManager hudDatabaseManager;
 	private final ConfigurationManager configManager;
 	private final HashMap<UUID,Integer> playerAfkManagerTasks;
 	
-	public PlayerListener(@NotNull JavaPlugin plugin, @NotNull IAfkDatabaseManager afkDatabaseManager,
+	public PlayerListener(@NotNull JavaPlugin plugin, @NotNull IExemptDatabaseManager afkDatabaseManager,
 						  @NotNull IHudDatabaseManager hudDatabaseManager, @NotNull ConfigurationManager configManager) {
 		this.plugin = plugin;
 		this.afkDatabaseManager = afkDatabaseManager;
