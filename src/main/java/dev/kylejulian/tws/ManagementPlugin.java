@@ -54,7 +54,7 @@ public class ManagementPlugin extends JavaPlugin {
 			return;
 		}
 
-		this.databaseConnectionManager = new DatabaseConnectionManager(databaseConfig);
+		this.databaseConnectionManager = new DatabaseConnectionManager(databaseConfig, this.getDataFolder().getAbsolutePath());
 		IAfkDatabaseManager afkDatabaseManager = new AfkDatabaseManager(this, this.databaseConnectionManager);
 		IHudDatabaseManager hudDatabaseManager = new HudDatabaseManager(this, this.databaseConnectionManager);
 

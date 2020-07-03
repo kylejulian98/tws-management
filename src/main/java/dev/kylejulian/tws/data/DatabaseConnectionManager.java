@@ -10,10 +10,10 @@ public class DatabaseConnectionManager {
 
 	private final BasicDataSource connectionPool;
 
-	public DatabaseConnectionManager(DatabaseConfigModel databaseConfig) {
+	public DatabaseConnectionManager(DatabaseConfigModel databaseConfig, String fileLocation) {
 		this.connectionPool = new BasicDataSource();
 		this.connectionPool.setDriverClassName("org.sqlite.JDBC");
-		this.connectionPool.setUrl("jdbc:sqlite:" + databaseConfig.getDirectory() + "\\" + databaseConfig.getDatabase());
+		this.connectionPool.setUrl("jdbc:sqlite:" + fileLocation + "\\" + databaseConfig.getName());
 		this.connectionPool.setInitialSize(1);
 		this.connectionPool.setMaxTotal(databaseConfig.getMaxConcurrentConnections());
 	}

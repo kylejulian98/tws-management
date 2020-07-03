@@ -125,8 +125,7 @@ public class ConfigurationManager {
         // Set default Database configuration
         if (configModel.getDatabaseConfig() == null) {
             DatabaseConfigModel databaseConfigModel = new DatabaseConfigModel();
-            databaseConfigModel.setDirectory(this.plugin.getDataFolder().getPath());
-            databaseConfigModel.setDatabase("tws-local.db");
+            databaseConfigModel.setName("tws-local.db");
             databaseConfigModel.setMaxConcurrentConnections(5);
 
             configModel.setDatabaseConfig(databaseConfigModel);
