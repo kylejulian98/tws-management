@@ -20,8 +20,7 @@
 		"hours": 0
 	},
 	"databaseConfig": {
-		"database": "tws-local.db",
-		"directory": "D:\\Games\\Minecraft\\Server\\plugins\\tws.management",
+		"name": "tws-local.db",
 		"maxConcurrentConnections": 5
 	}
 }
