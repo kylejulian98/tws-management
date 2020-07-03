@@ -7,8 +7,8 @@ import dev.kylejulian.tws.commands.tabcompleters.AfkTabCompleter;
 import dev.kylejulian.tws.configuration.*;
 import dev.kylejulian.tws.data.DatabaseConnectionManager;
 import dev.kylejulian.tws.data.MojangApi;
+import dev.kylejulian.tws.data.interfaces.IAfkDatabaseManager;
 import dev.kylejulian.tws.data.interfaces.IDatabaseManager;
-import dev.kylejulian.tws.data.interfaces.IExemptDatabaseManager;
 import dev.kylejulian.tws.data.interfaces.IHudDatabaseManager;
 import dev.kylejulian.tws.data.sqlite.AfkDatabaseManager;
 import dev.kylejulian.tws.data.sqlite.HudDatabaseManager;
@@ -54,8 +54,8 @@ public class ManagementPlugin extends JavaPlugin {
 			return;
 		}
 
-		this.databaseConnectionManager = new DatabaseConnectionManager(databaseConfig);
-		IExemptDatabaseManager afkDatabaseManager = new AfkDatabaseManager(this, this.databaseConnectionManager);
+		this.databaseConnectionManager = new DatabaseConnectionManager(databaseConfig, this.getDataFolder().getAbsolutePath());
+		IAfkDatabaseManager afkDatabaseManager = new AfkDatabaseManager(this, this.databaseConnectionManager);
 		IHudDatabaseManager hudDatabaseManager = new HudDatabaseManager(this, this.databaseConnectionManager);
 
 		this.getLogger().log(Level.INFO, "Internal dependencies have been created by {0}ms", stopWatch.getTime());

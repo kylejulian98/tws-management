@@ -2,7 +2,7 @@ name: tws.management
 main: dev.kylejulian.tws.ManagementPlugin
 author: JuHDude
 version: 0.0.2
-api-version: "1.16"
+api-version: "1.15"
 database: true
 softdepend: [TAB]
 commands:
