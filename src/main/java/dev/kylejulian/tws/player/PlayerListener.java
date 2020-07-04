@@ -81,9 +81,12 @@ public class PlayerListener implements Listener {
 		if (taskId != null) { // In the event of a reload
 			this.plugin.getServer().getScheduler().cancelTask(taskId);
 		}
-		
-		Runnable tabTask = () -> TabPluginHelper.setTabSuffix(this.plugin, playerId, ChatColor.RESET + "");
-		this.plugin.getServer().getScheduler().runTask(this.plugin, tabTask);
+
+		// Only reset the Tab if they were actually AFK
+		if (TabPluginHelper.hasTabSuffix(this.plugin, playerId)) {
+			Runnable tabTask = () -> TabPluginHelper.setTabSuffix(this.plugin, playerId, ChatColor.RESET + "");
+			this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, tabTask);
+		}
 
 		taskId = this.createAndStartAfkManagerTask(playerId);
 		this.playerAfkManagerTasks.put(playerId, taskId);
