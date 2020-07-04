@@ -3,7 +3,6 @@ package dev.kylejulian.tws.afk;
 import dev.kylejulian.tws.afk.events.AfkEvent;
 import dev.kylejulian.tws.configuration.AfkConfigModel;
 import dev.kylejulian.tws.data.interfaces.IAfkDatabaseManager;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -55,10 +54,7 @@ public class AfkManager implements Runnable {
 		if (!this.alreadyAfk && this.getPlayerAfkMinutes() == afkTime) { // Player is AFK
 			AfkEvent event = new AfkEvent(this.playerId);
 			
-			this.plugin.getServer().getScheduler().runTask(this.plugin, () -> {
-				player.sendMessage(ChatColor.DARK_RED + "You are now AFK");
-				this.plugin.getServer().getPluginManager().callEvent(event);
-			});
+			this.plugin.getServer().getScheduler().runTask(this.plugin, () -> this.plugin.getServer().getPluginManager().callEvent(event));
 		}
 
 		CompletableFuture<Boolean> isPlayerAfkKickExemptFuture = this.afkDatabase.isKickExempt(playerId);
