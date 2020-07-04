@@ -52,14 +52,13 @@ public class PlayerListener implements Listener {
 		this.playerAfkManagerTasks.put(playerId, taskId);
 
 		CompletableFuture<Boolean> isHudEnabledFuture = this.hudDatabaseManager.isEnabled(playerId);
-		CompletableFuture<Void> raiseHudEventFuture = isHudEnabledFuture.thenAcceptAsync(result -> {
+		isHudEnabledFuture.thenAcceptAsync(result -> {
 			if (result) {
 				// Raise Hud Event synchronously
 				plugin.getServer().getScheduler().runTask(plugin, () ->
 						plugin.getServer().getPluginManager().callEvent(new HudEvent(playerId, true)));
 			}
 		});
-		raiseHudEventFuture.join();
 	}
 
 	@EventHandler
@@ -105,6 +104,7 @@ public class PlayerListener implements Listener {
 		this.playerAfkManagerTasks.put(playerId, taskId);
 		
 		// Raise new AFK Event, as the AFKManager will not raise another due to the alreadyAfk being set to true property
+		// This is so the Plugin will kick the Player after the configurable kick time has elapsed
 		AfkEvent event = new AfkEvent(playerId);
 		Runnable afkEventTask = () -> this.plugin.getServer().getPluginManager().callEvent(event);
 		this.plugin.getServer().getScheduler().runTask(this.plugin, afkEventTask); // Cannot raise a new event asynchronously
@@ -113,16 +113,34 @@ public class PlayerListener implements Listener {
 	@EventHandler
 	public void onAfk(@NotNull AfkEvent e) {
 		UUID playerId = e.getPlayerId();
-		
-		Runnable tabTask = () -> TabPluginHelper.setTabSuffix(this.plugin, playerId, ChatColor.GRAY + "[" + ChatColor.RED + "AFK" + ChatColor.GRAY + "] " + ChatColor.RESET);
-		this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, tabTask);
+
+		if (!TabPluginHelper.hasTabSuffix(this.plugin, playerId)) {
+			Player player = this.plugin.getServer().getPlayer(playerId);
+			if (player != null) {
+				player.sendMessage(ChatColor.DARK_RED + "You are now AFK");
+				Runnable tabTask = () -> TabPluginHelper.setTabSuffix(this.plugin, playerId, ChatColor.GRAY + "[" + ChatColor.RED + "AFK" + ChatColor.GRAY + "] " + ChatColor.RESET);
+				this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, tabTask);
+			}
+		}
 	}
-	
-	private Integer createAndStartAfkManagerTask(@NotNull UUID playerId) {
+
+	/**
+	 * Creates and Starts a Afk Manager task, which determines when a Player is actually afk
+	 * @param playerId Player to create the Afk Manager task for
+	 * @return Task Id
+	 */
+	private int createAndStartAfkManagerTask(@NotNull UUID playerId) {
 		return createAndStartAfkManagerTask(playerId, false);
 	}
-	
-	private Integer createAndStartAfkManagerTask(@NotNull UUID playerId, boolean alreadyAfk) {
+
+	/**
+	 * Creates and Starts a Afk Manager task, which determines when a Player is actually afk. This overload
+	 * providers a boolean parameter which allows you to specify if the Player had requested the event, through /afk
+	 * @param playerId Player to create the Afk Manager task for
+	 * @param alreadyAfk Flag whether or not the Player has request to be Afk
+	 * @return Task Id
+	 */
+	private int createAndStartAfkManagerTask(@NotNull UUID playerId, boolean alreadyAfk) {
 		ConfigModel config = this.configManager.getConfig();
 		AfkConfigModel afkConfig = config.getAfkConfig();
 		
