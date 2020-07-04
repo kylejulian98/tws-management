@@ -81,7 +81,7 @@ public class AfkCommand implements CommandExecutor {
                                         return new CompletableFuture<>();
                                     }
 
-                                    queueSendMessageSync(sender, ChatColor.GREEN + "Added [" + ChatColor.BLUE + target + ChatColor.GREEN + "] to the Afk Kick exempt list.");
+                                    queueSendMessageSync(sender, ChatColor.GREEN + "Added [" + ChatColor.BLUE + target + ChatColor.GREEN + "] to the AFK Kick exempt list.");
                                     return this.afkDatabaseManager.addPlayer(uuid);
                                 });
 
@@ -115,7 +115,7 @@ public class AfkCommand implements CommandExecutor {
                                         return new CompletableFuture<>();
                                     }
 
-                                    queueSendMessageSync(sender, ChatColor.GREEN + "Player [" + ChatColor.BLUE + target + ChatColor.GREEN + "] has been removed from the Afk Kick exempt list.");
+                                    queueSendMessageSync(sender, ChatColor.GREEN + "Player [" + ChatColor.BLUE + target + ChatColor.GREEN + "] has been removed from the AFK Kick exempt list.");
                                     return this.afkDatabaseManager.removePlayer(uuid);
                                 });
 
