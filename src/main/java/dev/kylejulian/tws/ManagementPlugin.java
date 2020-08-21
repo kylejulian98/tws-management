@@ -7,11 +7,12 @@ import dev.kylejulian.tws.commands.tabcompleters.AfkTabCompleter;
 import dev.kylejulian.tws.configuration.*;
 import dev.kylejulian.tws.data.DatabaseConnectionManager;
 import dev.kylejulian.tws.data.MojangApi;
-import dev.kylejulian.tws.data.interfaces.IAfkDatabaseManager;
 import dev.kylejulian.tws.data.interfaces.IDatabaseManager;
+import dev.kylejulian.tws.data.interfaces.IExemptDatabaseManager;
 import dev.kylejulian.tws.data.interfaces.IHudDatabaseManager;
 import dev.kylejulian.tws.data.sqlite.AfkDatabaseManager;
 import dev.kylejulian.tws.data.sqlite.HudDatabaseManager;
+import dev.kylejulian.tws.data.sqlite.WhitelistDatabaseManager;
 import dev.kylejulian.tws.player.PlayerListener;
 import dev.kylejulian.tws.player.hud.HudListener;
 import dev.kylejulian.tws.server.whitelist.WhitelistRunnable;
@@ -55,7 +56,8 @@ public class ManagementPlugin extends JavaPlugin {
 		}
 
 		this.databaseConnectionManager = new DatabaseConnectionManager(databaseConfig, this.getDataFolder().getAbsolutePath());
-		IAfkDatabaseManager afkDatabaseManager = new AfkDatabaseManager(this, this.databaseConnectionManager);
+		IExemptDatabaseManager afkDatabaseManager = new AfkDatabaseManager(this, this.databaseConnectionManager);
+		IExemptDatabaseManager whitelistExemptDatabaseManager = new WhitelistDatabaseManager(this, databaseConnectionManager);
 		IHudDatabaseManager hudDatabaseManager = new HudDatabaseManager(this, this.databaseConnectionManager);
 
 		this.getLogger().log(Level.INFO, "Internal dependencies have been created by {0}ms", stopWatch.getTime());
@@ -72,7 +74,9 @@ public class ManagementPlugin extends JavaPlugin {
 
 		this.getLogger().log(Level.INFO, "Plugin Events have been registered by {0}ms", stopWatch.getTime());
 
-		this.getServer().getScheduler().runTaskTimerAsynchronously(this, new WhitelistRunnable(this, whitelistConfig), 0, 36000);
+		this.getServer().getScheduler().runTaskTimerAsynchronously(this,
+				new WhitelistRunnable(this, whitelistConfig, whitelistExemptDatabaseManager),
+				0, 36000);
 		
 		Objects.requireNonNull(this.getCommand("afk")).setExecutor(new AfkCommand(this, afkDatabaseManager, new MojangApi(this.getLogger())));
 		Objects.requireNonNull(this.getCommand("afk")).setTabCompleter(new AfkTabCompleter(this));

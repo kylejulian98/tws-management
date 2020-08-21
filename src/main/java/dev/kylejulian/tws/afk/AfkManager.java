@@ -2,7 +2,7 @@ package dev.kylejulian.tws.afk;
 
 import dev.kylejulian.tws.afk.events.AfkEvent;
 import dev.kylejulian.tws.configuration.AfkConfigModel;
-import dev.kylejulian.tws.data.interfaces.IAfkDatabaseManager;
+import dev.kylejulian.tws.data.interfaces.IExemptDatabaseManager;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -19,7 +19,7 @@ public class AfkManager implements Runnable {
 	private int afkMinutes;
 	private final boolean alreadyAfk;
 	private final JavaPlugin plugin;
-	private final IAfkDatabaseManager afkDatabase;
+	private final IExemptDatabaseManager afkDatabase;
 	private final AfkConfigModel afkConfig;
 	private final UUID playerId;
 
@@ -31,7 +31,7 @@ public class AfkManager implements Runnable {
 	 * @param playerId Player whom this AFK Manager belongs to
 	 * @param alreadyAfk Boolean flag to indicate whether or not the Player was already AFK when this AFK Manager was created
 	 */
-	public AfkManager(JavaPlugin plugin, IAfkDatabaseManager afkDatabase, AfkConfigModel afkConfig, UUID playerId, boolean alreadyAfk) {
+	public AfkManager(JavaPlugin plugin, IExemptDatabaseManager afkDatabase, AfkConfigModel afkConfig, UUID playerId, boolean alreadyAfk) {
 		this.plugin = plugin;
 		this.afkDatabase = afkDatabase;
 		this.afkConfig = afkConfig;
@@ -57,7 +57,7 @@ public class AfkManager implements Runnable {
 			this.plugin.getServer().getScheduler().runTask(this.plugin, () -> this.plugin.getServer().getPluginManager().callEvent(event));
 		}
 
-		CompletableFuture<Boolean> isPlayerAfkKickExemptFuture = this.afkDatabase.isKickExempt(playerId);
+		CompletableFuture<Boolean> isPlayerAfkKickExemptFuture = this.afkDatabase.isExempt(playerId);
 		CompletableFuture<Void> kickPlayerFuture = isPlayerAfkKickExemptFuture.thenAcceptAsync(result -> {
 			if (!result) { // Player is not Kick exempt
 				if (canKickPlayer(afkKickTime, afkTime)) {

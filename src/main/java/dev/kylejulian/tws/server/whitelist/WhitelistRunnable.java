@@ -1,6 +1,7 @@
 package dev.kylejulian.tws.server.whitelist;
 
 import dev.kylejulian.tws.configuration.WhitelistConfigModel;
+import dev.kylejulian.tws.data.interfaces.IExemptDatabaseManager;
 import dev.kylejulian.tws.server.LuckPermsHelper;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -21,10 +22,13 @@ public class WhitelistRunnable implements Runnable {
 
     private final JavaPlugin plugin;
     private final WhitelistConfigModel whitelistConfigModel;
+    private final IExemptDatabaseManager whitelistExemptDatabaseManager;
 
-    public WhitelistRunnable(@NotNull JavaPlugin plugin, @NotNull WhitelistConfigModel whitelistConfigModel) {
+    public WhitelistRunnable(@NotNull JavaPlugin plugin, @NotNull WhitelistConfigModel whitelistConfigModel,
+                             @NotNull IExemptDatabaseManager whitelistExemptDatabaseManager) {
         this.plugin = plugin;
         this.whitelistConfigModel = whitelistConfigModel;
+        this.whitelistExemptDatabaseManager = whitelistExemptDatabaseManager;
     }
 
     @Override
