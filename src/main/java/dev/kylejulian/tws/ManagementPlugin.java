@@ -78,7 +78,7 @@ public class ManagementPlugin extends JavaPlugin {
 
 		this.getServer().getScheduler().runTaskTimerAsynchronously(this,
 				new WhitelistRunnable(this, whitelistConfig, whitelistExemptDatabaseManager),
-				0, 36000);
+				0, 36000); //200
 
 		MojangApi mojangApi = new MojangApi(this.getLogger());
 		Objects.requireNonNull(this.getCommand("afk")).setExecutor(new AfkCommand(this, afkDatabaseManager, mojangApi));
