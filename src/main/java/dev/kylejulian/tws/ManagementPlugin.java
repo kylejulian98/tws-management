@@ -3,6 +3,7 @@ package dev.kylejulian.tws;
 import dev.kylejulian.tws.afk.AfkEventListener;
 import dev.kylejulian.tws.commands.AfkCommand;
 import dev.kylejulian.tws.commands.HudCommand;
+import dev.kylejulian.tws.commands.WhitelistExemptCommand;
 import dev.kylejulian.tws.commands.tabcompleters.AfkTabCompleter;
 import dev.kylejulian.tws.configuration.*;
 import dev.kylejulian.tws.data.DatabaseConnectionManager;
@@ -62,7 +63,7 @@ public class ManagementPlugin extends JavaPlugin {
 
 		this.getLogger().log(Level.INFO, "Internal dependencies have been created by {0}ms", stopWatch.getTime());
 
-		runDefaultSchemaSetup(new IDatabaseManager[] {afkDatabaseManager, hudDatabaseManager} );
+		runDefaultSchemaSetup(new IDatabaseManager[] {afkDatabaseManager, hudDatabaseManager, whitelistExemptDatabaseManager} );
 
 		this.getLogger().log(Level.INFO, "Database schemas have been validated by {0}ms", stopWatch.getTime());
 		
@@ -77,10 +78,12 @@ public class ManagementPlugin extends JavaPlugin {
 		this.getServer().getScheduler().runTaskTimerAsynchronously(this,
 				new WhitelistRunnable(this, whitelistConfig, whitelistExemptDatabaseManager),
 				0, 36000);
-		
-		Objects.requireNonNull(this.getCommand("afk")).setExecutor(new AfkCommand(this, afkDatabaseManager, new MojangApi(this.getLogger())));
+
+		MojangApi mojangApi = new MojangApi(this.getLogger());
+		Objects.requireNonNull(this.getCommand("afk")).setExecutor(new AfkCommand(this, afkDatabaseManager, mojangApi));
 		Objects.requireNonNull(this.getCommand("afk")).setTabCompleter(new AfkTabCompleter(this));
 		Objects.requireNonNull(this.getCommand("hud")).setExecutor(new HudCommand(this, hudDatabaseManager));
+		Objects.requireNonNull(this.getCommand("exe")).setExecutor(new WhitelistExemptCommand(this, whitelistExemptDatabaseManager, mojangApi));
 
 		stopWatch.stop();
 		this.getLogger().log(Level.INFO, "Plugin started in {0}ms", stopWatch.getTime());
