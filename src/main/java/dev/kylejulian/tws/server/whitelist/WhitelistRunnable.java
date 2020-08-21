@@ -41,6 +41,7 @@ public class WhitelistRunnable implements Runnable {
         int noOfDays = this.whitelistConfigModel.getDays();
         int noOfHours = this.whitelistConfigModel.getHours();
         LocalDateTime now = LocalDateTime.now();
+//        LocalDateTime unwhitelistDate = now.minusSeconds(10);
         LocalDateTime unwhitelistDate = now.minusDays(noOfDays).minusHours(noOfHours);
 
         LuckPermsHelper luckPermsHelper = getLuckPermsHelper();
@@ -59,8 +60,17 @@ public class WhitelistRunnable implements Runnable {
                 playerHasPermissionFuture = CompletableFuture.supplyAsync(() -> false); // We return false to indicate the player is not exempt
             }
 
+            CompletableFuture<Boolean> playerIsExempt =
+                    playerHasPermissionFuture.thenCombineAsync(whitelistExemptDatabaseManager.isExempt(playerId), (playerHasPermission, playerDatabaseExempt) -> {
+                        if (playerHasPermission) {
+                            return true;
+                        }
+
+                        return playerDatabaseExempt;
+                    });
+
             CompletableFuture<PlayerWhitelisted> playerToBeUnwhitelistedFuture =
-                    getVerifyWhitelistedPlayerFuture(unwhitelistDate, whitelistedPlayersArray[i], playerHasPermissionFuture);
+                    getVerifyWhitelistedPlayerFuture(unwhitelistDate, whitelistedPlayersArray[i], playerIsExempt);
             CompletableFuture<Void> unwhitelistPlayerFuture = getPlayerNeedsToUnwhitelistedFuture(playerToBeUnwhitelistedFuture);
             completableFutures[i] = unwhitelistPlayerFuture;
         }
@@ -120,14 +130,14 @@ public class WhitelistRunnable implements Runnable {
                 long days = lastPlayDate.until(LocalDateTime.now(), ChronoUnit.DAYS);
                 if (lastPlayDate.isBefore(unwhitelistDate)) {
                     this.plugin.getLogger().log(Level.INFO, "Player ({0}) has been unwhitelisted due to inactivity! Has been inactive for : {1} days!",
-                            new Object[] { whitelistedPlayer.getName(), days });
+                            new Object[]{whitelistedPlayer.getName(), days});
 
                     playerWhitelisted.setWhitelist(false);
                     return playerWhitelisted;
                 }
 
                 this.plugin.getLogger().log(Level.FINE, "Player ({0}) will not be unwhitelisted! Has been inactive for : {1} days!",
-                        new Object[] { whitelistedPlayer.getName(), days });
+                        new Object[]{whitelistedPlayer.getName(), days});
             }
 
             return playerWhitelisted;
