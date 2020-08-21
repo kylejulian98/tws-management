@@ -4,8 +4,12 @@ import dev.kylejulian.tws.afk.events.AfkCommandEvent;
 import dev.kylejulian.tws.data.MojangApi;
 import dev.kylejulian.tws.data.entities.EntityExemptList;
 import dev.kylejulian.tws.data.interfaces.IExemptDatabaseManager;
-import net.md_5.bungee.api.chat.*;
+import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ClickEvent.Action;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -13,11 +17,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
 public class AfkCommand implements CommandExecutor {
@@ -185,28 +189,40 @@ public class AfkCommand implements CommandExecutor {
         baseMessage.append(newLine);
 
         for (UUID id : playerIds) {
-            String playerName;
-            Player player = this.plugin.getServer().getPlayer(id);
+            CompletableFuture<Player> playerIsOnServerFuture = CompletableFuture.supplyAsync(() -> this.plugin.getServer().getPlayer(id));
 
-            // If player is not online, fetch it from the Mojang API
-            if (player == null) {
-                playerName = this.getName(id);
-            } else {
-                playerName = player.getDisplayName();
+            CompletableFuture<String> playerNameFuture = playerIsOnServerFuture.thenCompose(player -> {
+                if (player == null) {
+                    return this.mojangApi.getPlayerName(id);
+                } else {
+                    return CompletableFuture.supplyAsync(player::getDisplayName);
+                }
+            });
+
+            CompletableFuture<String> validPlayerNameFuture = playerNameFuture.thenApply(s -> {
+                if (s == null || s.equals("")) {
+                    return id.toString();
+                }
+                return s;
+            });
+
+            String playerName = null;
+            try {
+                playerName = validPlayerNameFuture.get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
             }
 
-            if (playerName == null || playerName.equals("")) {
-                playerName = id.toString();
+            if (playerName != null) {
+                baseMessage.append(ChatColor.YELLOW + "Player (" + ChatColor.GREEN + playerName + ChatColor.YELLOW + ")");
+                baseMessage.append(newLine);
             }
-
-            baseMessage.append(ChatColor.YELLOW + "Player (" + ChatColor.GREEN + playerName + ChatColor.YELLOW + ")").append(newLine);
         }
 
         baseMessage.append(newLine).append(ChatColor.RED + "<--" + ChatColor.RESET);
 
         if (prevPage > 0) { // Only allow user to go back if they can
-            BaseComponent[] previousPageHoverText = new ComponentBuilder("Click to go to the previous Page").create();
-            HoverEvent previousPageHoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, previousPageHoverText);
+            HoverEvent previousPageHoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to go to the previous Page"));
             baseMessage.event(previousPageHoverEvent).event(new ClickEvent(Action.RUN_COMMAND, "/afk exempt list " + prevPage));
             baseMessage.append("").reset(); // Fix to prevent the rest of the baseMessage being associated to this event.
         }
@@ -215,22 +231,13 @@ public class AfkCommand implements CommandExecutor {
                 .append(ChatColor.RED + "-->" + ChatColor.RESET);
 
         if (nextPage <= maxPages) {// Only allow user to go forward if they can
-            BaseComponent[] nextPageHoverText = new ComponentBuilder("Click to go to the next Page").create();
-            HoverEvent nextPageHoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, nextPageHoverText);
+            HoverEvent nextPageHoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to go to the next Page"));
             baseMessage.event(nextPageHoverEvent).event(new ClickEvent(Action.RUN_COMMAND, "/afk exempt list " + nextPage));
         }
+
         baseMessage.append(newLine);
 
         return baseMessage;
-    }
-
-    /***
-     * Get a Player Username from the Mojang Api based on a Player Id
-     * @return Username or null
-     */
-    private @Nullable String getName(@NotNull UUID playerId) {
-        CompletableFuture<String> playerNameFuture = this.mojangApi.getPlayerName(playerId);
-        return playerNameFuture.join();
     }
 
     private void queueSendMessageSync(@NotNull CommandSender sender, @NotNull String message) {
