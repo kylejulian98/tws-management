@@ -2,13 +2,13 @@ package dev.kylejulian.tws.commands.models;
 
 import java.util.UUID;
 
-public class WhitelistExemptFutureModel {
+public class ExemptFutureModel {
 
     private final UUID playerId;
 
     private final Boolean isExempt;
 
-    public WhitelistExemptFutureModel(final UUID playerId, final Boolean isExempt) {
+    public ExemptFutureModel(final UUID playerId, final Boolean isExempt) {
         this.playerId = playerId;
         this.isExempt = isExempt;
     }
