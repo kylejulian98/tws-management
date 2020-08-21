@@ -43,10 +43,7 @@ public class AfkCommand implements CommandExecutor {
                 Player player = (Player) sender;
 
                 AfkCommandEvent event = new AfkCommandEvent(player.getUniqueId());
-                Runnable afkEventTask = () -> {
-                    player.sendMessage(ChatColor.DARK_RED + "You are now AFK");
-                    this.plugin.getServer().getPluginManager().callEvent(event);
-                };
+                Runnable afkEventTask = () -> this.plugin.getServer().getPluginManager().callEvent(event);
 
                 this.plugin.getServer().getScheduler().runTask(this.plugin, afkEventTask);
             } else {
