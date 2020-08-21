@@ -5,6 +5,7 @@ import dev.kylejulian.tws.commands.AfkCommand;
 import dev.kylejulian.tws.commands.HudCommand;
 import dev.kylejulian.tws.commands.WhitelistExemptCommand;
 import dev.kylejulian.tws.commands.tabcompleters.AfkTabCompleter;
+import dev.kylejulian.tws.commands.tabcompleters.WhitelistExemptTabCompleter;
 import dev.kylejulian.tws.configuration.*;
 import dev.kylejulian.tws.data.DatabaseConnectionManager;
 import dev.kylejulian.tws.data.MojangApi;
@@ -84,6 +85,8 @@ public class ManagementPlugin extends JavaPlugin {
 		Objects.requireNonNull(this.getCommand("afk")).setTabCompleter(new AfkTabCompleter(this));
 		Objects.requireNonNull(this.getCommand("hud")).setExecutor(new HudCommand(this, hudDatabaseManager));
 		Objects.requireNonNull(this.getCommand("exe")).setExecutor(new WhitelistExemptCommand(this, whitelistExemptDatabaseManager, mojangApi));
+		Objects.requireNonNull(this.getCommand("exe")).setTabCompleter(new WhitelistExemptTabCompleter(this));
+
 
 		stopWatch.stop();
 		this.getLogger().log(Level.INFO, "Plugin started in {0}ms", stopWatch.getTime());
