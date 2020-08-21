@@ -2,7 +2,7 @@ name: tws.management
 main: dev.kylejulian.tws.ManagementPlugin
 author: JuHDude
 version: 0.0.4
-api-version: "1.15"
+api-version: "1.16"
 database: true
 softdepend: [TAB, LuckPerms]
 commands:
@@ -18,6 +18,14 @@ commands:
     usage: |
       /<command>
       Example: /<command>
+  exe:
+    description: To add a player to whitelist exempt list. Specify 'list' to display everyone in the list. Use the command again if you want to remove them from the exempt list
+    usage: |
+      /<command> [add|remove|list]
+      Example: /<command> add Player1
+      Example: /<command> remove Player1
+      Example: /<command> list
+    permission: tws.exempt
 permissions:
   tws.*:
     description: Gives access to all commands from the TWS plugin.
