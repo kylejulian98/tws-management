@@ -90,7 +90,11 @@ public class MojangApi {
 				return name;
 			}
 			catch (IOException e) {
-				this.logger.log(Level.INFO, "Unable to find PlayerId {0} from the Mojang Api", playerId);
+				this.logger.log(Level.WARNING, "Unable to find PlayerId {0} from the Mojang Api", playerId);
+			}
+			catch (Exception e) {
+				this.logger.log(Level.SEVERE, "Unable to find PlayerId {0} from the Mojang Api", playerId);
+				e.printStackTrace();
 			}
 
 			return null;
