@@ -2,8 +2,8 @@ package dev.kylejulian.tws.commands;
 
 import dev.kylejulian.tws.afk.events.AfkCommandEvent;
 import dev.kylejulian.tws.data.MojangApi;
-import dev.kylejulian.tws.data.entities.AfkKickExemptList;
-import dev.kylejulian.tws.data.interfaces.IAfkDatabaseManager;
+import dev.kylejulian.tws.data.entities.EntityExemptList;
+import dev.kylejulian.tws.data.interfaces.IExemptDatabaseManager;
 import net.md_5.bungee.api.chat.*;
 import net.md_5.bungee.api.chat.ClickEvent.Action;
 import org.bukkit.ChatColor;
@@ -23,10 +23,10 @@ import java.util.logging.Level;
 public class AfkCommand implements CommandExecutor {
 
     private final JavaPlugin plugin;
-    private final IAfkDatabaseManager afkDatabaseManager;
+    private final IExemptDatabaseManager afkDatabaseManager;
     private final MojangApi mojangApi;
 
-    public AfkCommand(@NotNull JavaPlugin plugin, @NotNull IAfkDatabaseManager afkDatabaseManager, @NotNull MojangApi mojangApi) {
+    public AfkCommand(@NotNull JavaPlugin plugin, @NotNull IExemptDatabaseManager afkDatabaseManager, @NotNull MojangApi mojangApi) {
         this.plugin = plugin;
         this.afkDatabaseManager = afkDatabaseManager;
         this.mojangApi = mojangApi;
@@ -72,7 +72,7 @@ public class AfkCommand implements CommandExecutor {
                         }
 
                         playerIdFuture
-                                .thenCompose(this.afkDatabaseManager::isKickExempt)
+                                .thenCompose(this.afkDatabaseManager::isExempt)
                                 .thenCombine(playerIdFuture, (isPlayerAfkExempt, playerId) -> {
                                     if (isPlayerAfkExempt) { // Player is exempt
                                         queueSendMessageSync(sender, ChatColor.RED + "Player [" + ChatColor.BLUE + target + ChatColor.RED + "] is already exempt.");
@@ -86,29 +86,27 @@ public class AfkCommand implements CommandExecutor {
                                     }
 
                                     queueSendMessageSync(sender, ChatColor.GREEN + "Added [" + ChatColor.BLUE + target + ChatColor.GREEN + "] to the AFK Kick exempt list.");
-                                    return this.afkDatabaseManager.addPlayer(uuid);
+                                    return this.afkDatabaseManager.add(uuid);
                                 });
-
                     } else if (command.equalsIgnoreCase("remove")) {
+                        CompletableFuture<UUID> playerIdFuture;
                         String target;
                         if (args.length == 3) {
                             target = args[2];
+                            playerIdFuture = this.mojangApi.getPlayerId(target);
                         } else {
                             return false;
                         }
 
-                        CompletableFuture<UUID> playerIdFuture = this.mojangApi.getPlayerId(target);
+                        if (playerIdFuture == null) {
+                            sender.sendMessage(ChatColor.RED + "You need to specify a target player to exempt.");
+                            return true;
+                        }
 
                         playerIdFuture
-                                .thenCompose(playerId -> {
-                                    if (playerId == null) {
-                                        queueSendMessageSync(sender, ChatColor.RED + "You need to specify a target player to exempt.");
-                                        return new CompletableFuture<>().thenApplyAsync(isAfkExempt -> false);
-                                    }
-                                    return this.afkDatabaseManager.isKickExempt(playerId);
-                                })
+                                .thenCompose(this.afkDatabaseManager::isExempt)
                                 .thenCombine(playerIdFuture, (isPlayerAfkExempt, playerId) -> {
-                                    if (!isPlayerAfkExempt) { // Player is exempt
+                                    if (!isPlayerAfkExempt) { // Player is not exempt
                                         queueSendMessageSync(sender, ChatColor.RED + "Player [" + ChatColor.BLUE + target + ChatColor.RED + "] is not exempt.");
                                         return UUID.fromString("00000000-0000-0000-0000-000000000000");
                                     }
@@ -120,9 +118,8 @@ public class AfkCommand implements CommandExecutor {
                                     }
 
                                     queueSendMessageSync(sender, ChatColor.GREEN + "Player [" + ChatColor.BLUE + target + ChatColor.GREEN + "] has been removed from the AFK Kick exempt list.");
-                                    return this.afkDatabaseManager.removePlayer(uuid);
+                                    return this.afkDatabaseManager.remove(uuid);
                                 });
-
                     } else if (command.equalsIgnoreCase("list")) {
                         int pageIndex;
 
@@ -142,12 +139,12 @@ public class AfkCommand implements CommandExecutor {
 
                         final int finalPageIndex = pageIndex;
                         int pageSize = 5;
-                        CompletableFuture<AfkKickExemptList> getAfkExemptPlayers = this.afkDatabaseManager.getPlayers(pageIndex, pageSize);
+                        CompletableFuture<EntityExemptList> getAfkExemptPlayers = this.afkDatabaseManager.getPlayers(pageIndex, pageSize);
 
                         getAfkExemptPlayers
                                 .thenAcceptAsync(result -> {
                                     ArrayList<UUID> playerIds = result.getPlayerIds();
-                                    int maxPages = result.getPageCount();
+                                    int maxPages = result.getMaxPageCount();
 
                                     if (playerIds.isEmpty()) {
                                         sender.sendMessage(ChatColor.YELLOW + "There are no results to be shown.");

@@ -61,6 +61,9 @@ public abstract class DatabaseManager implements IDatabaseManager {
 			} catch (SQLException e) {
 				this.getPlugin().getLogger().log(Level.WARNING, "Unable to execute query.");
 				this.getPlugin().getLogger().log(Level.WARNING, e.getMessage());
+			} catch (Exception e) {
+				this.getPlugin().getLogger().log(Level.SEVERE, "Unable to execute query for execute.");
+				e.printStackTrace();
 			}
 		});
 	}
@@ -93,8 +96,11 @@ public abstract class DatabaseManager implements IDatabaseManager {
 
 				result = count >= 1;
 			} catch (SQLException e) {
-				this.getPlugin().getLogger().log(Level.WARNING, "Unable to execute query for Whitelist exempt check.");
+				this.getPlugin().getLogger().log(Level.WARNING, "Unable to execute query for exists check.");
 				this.getPlugin().getLogger().log(Level.WARNING, e.getMessage());
+			} catch (Exception e) {
+				this.getPlugin().getLogger().log(Level.SEVERE, "Unable to execute query for exists check.");
+				e.printStackTrace();
 			} finally {
 				if (set != null) {
 					try {
@@ -117,8 +123,9 @@ public abstract class DatabaseManager implements IDatabaseManager {
 	 * provided in the specified params
 	 */
 	private void buildQueryParameters(final PreparedStatement statement, final Object[] params) throws SQLException {
-		for (int i = 1; i <= params.length; i++) {
-			statement.setObject(i, params[i]);
+		for (int i = 0; i < params.length; i++) {
+			int parameterIndex = i + 1; // First query param starts at 1
+			statement.setObject(parameterIndex, params[i]);
 		}
 	}
 }
