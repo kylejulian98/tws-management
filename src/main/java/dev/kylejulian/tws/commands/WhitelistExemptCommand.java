@@ -3,11 +3,8 @@ package dev.kylejulian.tws.commands;
 import dev.kylejulian.tws.data.MojangApi;
 import dev.kylejulian.tws.data.entities.EntityExemptList;
 import dev.kylejulian.tws.data.interfaces.IExemptDatabaseManager;
-import net.md_5.bungee.api.chat.ClickEvent;
+import dev.kylejulian.tws.extensions.ExemptListChatHelpers;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -19,7 +16,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class WhitelistExemptCommand implements CommandExecutor {
 
@@ -55,7 +51,7 @@ public class WhitelistExemptCommand implements CommandExecutor {
                     return false;
                 }
             } else {
-               pageIndex = 1;
+                pageIndex = 1;
             }
 
             final int finalPageIndex = pageIndex;
@@ -73,7 +69,9 @@ public class WhitelistExemptCommand implements CommandExecutor {
                 }
 
                 sender.sendMessage(ChatColor.YELLOW + "Auto Unwhitelist Exempt List");
-                ComponentBuilder baseMessage = buildPaginationMessage(finalPageIndex, maxPages, playerIds);
+                ExemptListChatHelpers exemptListChatHelpers = new ExemptListChatHelpers(this.plugin, this.mojangApi);
+
+                ComponentBuilder baseMessage = exemptListChatHelpers.buildPaginationMessage(finalPageIndex, maxPages, "/exe list", playerIds);
                 sender.spigot().sendMessage(baseMessage.create());
 
                 if (!(sender instanceof Player) && finalPageIndex != maxPages) {
@@ -130,68 +128,6 @@ public class WhitelistExemptCommand implements CommandExecutor {
 
         return true;
     }
-
-    private @NotNull ComponentBuilder buildPaginationMessage(int pageIndex, int maxPages, @NotNull ArrayList<UUID> playerIds) {
-        int nextPage = pageIndex + 1;
-        int prevPage = pageIndex - 1;
-
-        TextComponent newLine = new TextComponent("\n");
-        ComponentBuilder baseMessage = new ComponentBuilder();
-
-        baseMessage.append(newLine);
-
-        for (UUID id : playerIds) {
-            CompletableFuture<Player> playerIsOnServerFuture = CompletableFuture.supplyAsync(() -> this.plugin.getServer().getPlayer(id));
-
-            CompletableFuture<String> playerNameFuture = playerIsOnServerFuture.thenCompose(player -> {
-                if (player == null) {
-                    return this.mojangApi.getPlayerName(id);
-                } else {
-                    return CompletableFuture.supplyAsync(player::getDisplayName);
-                }
-            });
-
-            CompletableFuture<String> validPlayerNameFuture = playerNameFuture.thenApply(s -> {
-                if (s == null || s.equals("")) {
-                    return id.toString();
-                }
-                return s;
-            });
-
-            String playerName = null;
-            try {
-                playerName = validPlayerNameFuture.get();
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-
-            if (playerName != null) {
-                baseMessage.append(ChatColor.YELLOW + "Player (" + ChatColor.GREEN + playerName + ChatColor.YELLOW + ")");
-                baseMessage.append(newLine);
-            }
-        }
-
-        baseMessage.append(newLine).append(ChatColor.RED + "<--" + ChatColor.RESET);
-
-        if (prevPage > 0) { // Only allow user to go back if they can
-            HoverEvent previousPageHoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to go to the previous Page"));
-            baseMessage.event(previousPageHoverEvent).event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/exe list " + prevPage));
-            baseMessage.append("").reset(); // Fix to prevent the rest of the baseMessage being associated to this event.
-        }
-
-        baseMessage.append(ChatColor.YELLOW + " Page (" + ChatColor.GREEN + pageIndex + "/" + maxPages + ChatColor.YELLOW + ") " + ChatColor.RESET)
-                .append(ChatColor.RED + "-->" + ChatColor.RESET);
-
-        if (nextPage <= maxPages) {// Only allow user to go forward if they can
-            HoverEvent nextPageHoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to go to the next Page"));
-            baseMessage.event(nextPageHoverEvent).event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/exe list " + nextPage));
-        }
-
-        baseMessage.append(newLine);
-
-        return baseMessage;
-    }
-
 }
 
 class WhitelistExemptFutureModel {
