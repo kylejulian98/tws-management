@@ -1,6 +1,7 @@
 package dev.kylejulian.tws.commands;
 
 import dev.kylejulian.tws.afk.events.AfkCommandEvent;
+import dev.kylejulian.tws.commands.models.ExemptFutureModel;
 import dev.kylejulian.tws.data.MojangApi;
 import dev.kylejulian.tws.data.entities.EntityExemptList;
 import dev.kylejulian.tws.data.interfaces.IExemptDatabaseManager;
@@ -50,130 +51,99 @@ public class AfkCommand implements CommandExecutor {
             String base = args[0];
             String command = args[1];
 
-            if (sender.hasPermission("tws.afk.exempt") || sender.isOp()) {
-                if (base.equalsIgnoreCase("exempt")) {
-                    if (command.equalsIgnoreCase("add")) {
-                        CompletableFuture<UUID> playerIdFuture;
-                        String target;
-                        if (args.length == 3) {
-                            target = args[2];
-                            playerIdFuture = this.mojangApi.getPlayerId(target);
-                        } else {
-                            return false;
-                        }
+            if (!base.equalsIgnoreCase("exempt")) {
+                sender.sendMessage(ChatColor.RED + "Command is not recognised");
+                return false;
+            }
 
-                        if (playerIdFuture == null) {
-                            sender.sendMessage(ChatColor.RED + "You need to specify a target player to exempt.");
-                            return true;
-                        }
+            if (!sender.hasPermission("tws.afk.exempt") && !sender.isOp()) {
+                sender.sendMessage(ChatColor.RED + "You do not have permissions to use this command.");
+                return true;
+            }
 
-                        playerIdFuture
-                                .thenCompose(this.afkDatabaseManager::isExempt)
-                                .thenCombine(playerIdFuture, (isPlayerAfkExempt, playerId) -> {
-                                    if (isPlayerAfkExempt) { // Player is exempt
-                                        queueSendMessageSync(sender, ChatColor.RED + "Player [" + ChatColor.BLUE + target + ChatColor.RED + "] is already exempt.");
-                                        return UUID.fromString("00000000-0000-0000-0000-000000000000");
-                                    }
-                                    return playerId;
-                                })
-                                .thenCompose(uuid -> {
-                                    if (uuid.equals(UUID.fromString("00000000-0000-0000-0000-000000000000"))) {
-                                        return new CompletableFuture<>();
-                                    }
+            if (command.equalsIgnoreCase("list")) {
+                int pageIndex;
 
-                                    queueSendMessageSync(sender, ChatColor.GREEN + "Added [" + ChatColor.BLUE + target + ChatColor.GREEN + "] to the AFK Kick exempt list.");
-                                    return this.afkDatabaseManager.add(uuid);
-                                });
-                    } else if (command.equalsIgnoreCase("remove")) {
-                        CompletableFuture<UUID> playerIdFuture;
-                        String target;
-                        if (args.length == 3) {
-                            target = args[2];
-                            playerIdFuture = this.mojangApi.getPlayerId(target);
-                        } else {
-                            return false;
-                        }
-
-                        if (playerIdFuture == null) {
-                            sender.sendMessage(ChatColor.RED + "You need to specify a target player to exempt.");
-                            return true;
-                        }
-
-                        playerIdFuture
-                                .thenCompose(this.afkDatabaseManager::isExempt)
-                                .thenCombine(playerIdFuture, (isPlayerAfkExempt, playerId) -> {
-                                    if (!isPlayerAfkExempt) { // Player is not exempt
-                                        queueSendMessageSync(sender, ChatColor.RED + "Player [" + ChatColor.BLUE + target + ChatColor.RED + "] is not exempt.");
-                                        return UUID.fromString("00000000-0000-0000-0000-000000000000");
-                                    }
-                                    return playerId;
-                                })
-                                .thenCompose(uuid -> {
-                                    if (uuid.equals(UUID.fromString("00000000-0000-0000-0000-000000000000"))) {
-                                        return new CompletableFuture<>();
-                                    }
-
-                                    queueSendMessageSync(sender, ChatColor.GREEN + "Player [" + ChatColor.BLUE + target + ChatColor.GREEN + "] has been removed from the AFK Kick exempt list.");
-                                    return this.afkDatabaseManager.remove(uuid);
-                                });
-                    } else if (command.equalsIgnoreCase("list")) {
-                        int pageIndex;
-
-                        if (args.length == 3) {
-                            try {
-                                pageIndex = Integer.parseInt(args[2]);
-                                if (pageIndex < 1) {
-                                    pageIndex = 1;
-                                }
-                            } catch (NumberFormatException e) {
-                                sender.sendMessage(ChatColor.RED + "You must specify a valid page number!");
-                                return false;
-                            }
-                        } else {
+                if (args.length == 3) {
+                    try {
+                        pageIndex = Integer.parseInt(args[2]);
+                        if (pageIndex < 1) {
                             pageIndex = 1;
                         }
-
-                        final int finalPageIndex = pageIndex;
-                        int pageSize = 5;
-                        CompletableFuture<EntityExemptList> getAfkExemptPlayers = this.afkDatabaseManager.getPlayers(pageIndex, pageSize);
-
-                        getAfkExemptPlayers
-                                .thenAcceptAsync(result -> {
-                                    ArrayList<UUID> playerIds = result.getPlayerIds();
-                                    int maxPages = result.getMaxPageCount();
-
-                                    if (playerIds.isEmpty()) {
-                                        sender.sendMessage(ChatColor.YELLOW + "There are no results to be shown.");
-                                        return;
-                                    }
-
-                                    sender.sendMessage(ChatColor.YELLOW + "AFK Kick Exempt List");
-                                    ExemptListChatHelpers exemptListChatHelpers = new ExemptListChatHelpers(this.plugin, this.mojangApi);
-
-                                    ComponentBuilder baseMessage = exemptListChatHelpers.buildPaginationMessage(finalPageIndex, maxPages, "/afk exempt list", playerIds);
-                                    sender.spigot().sendMessage(baseMessage.create());
-
-                                    if (!(sender instanceof Player) && finalPageIndex != maxPages) {
-                                        sender.sendMessage(ChatColor.YELLOW + "To fetch the next page you need to use [" + ChatColor.GREEN + "/afk exempt list "
-                                                + (finalPageIndex + 1) + ChatColor.YELLOW + "]");
-                                    }
-                                });
-
-                    } else {
-                        sender.sendMessage(ChatColor.RED + "Command not recognised.");
+                    } catch (NumberFormatException e) {
+                        sender.sendMessage(ChatColor.RED + "You must specify a valid page number!");
+                        return false;
                     }
+                } else {
+                    pageIndex = 1;
                 }
-            } else {
-                sender.sendMessage(ChatColor.RED + "You do not have permissions to use this command.");
+
+                final int finalPageIndex = pageIndex;
+                int pageSize = 5;
+                CompletableFuture<EntityExemptList> getAfkExemptPlayers = this.afkDatabaseManager.getPlayers(pageIndex, pageSize);
+
+                getAfkExemptPlayers
+                        .thenAcceptAsync(result -> {
+                            ArrayList<UUID> playerIds = result.getPlayerIds();
+                            int maxPages = result.getMaxPageCount();
+
+                            if (playerIds.isEmpty()) {
+                                sender.sendMessage(ChatColor.YELLOW + "There are no results to be shown.");
+                                return;
+                            }
+
+                            sender.sendMessage(ChatColor.YELLOW + "AFK Kick Exempt List");
+                            ExemptListChatHelpers exemptListChatHelpers = new ExemptListChatHelpers(this.plugin, this.mojangApi);
+
+                            ComponentBuilder baseMessage = exemptListChatHelpers.buildPaginationMessage(finalPageIndex, maxPages, "/afk exempt list", playerIds);
+                            sender.spigot().sendMessage(baseMessage.create());
+
+                            if (!(sender instanceof Player) && finalPageIndex != maxPages) {
+                                sender.sendMessage(ChatColor.YELLOW + "To fetch the next page you need to use [" + ChatColor.GREEN + "/afk exempt list "
+                                        + (finalPageIndex + 1) + ChatColor.YELLOW + "]");
+                            }
+                        });
+
+                return true;
             }
-        } else {
-            sender.sendMessage(ChatColor.RED + "You need to specify the correct number of arguments.");
+
+            if (args.length < 3) {
+                sender.sendMessage(ChatColor.RED + "You need to specify the correct number of arguments.");
+                return false;
+            }
+            String target = args[2];
+            CompletableFuture<UUID> playerIdFuture = this.mojangApi.getPlayerId(target);
+
+            playerIdFuture
+                    .thenComposeAsync(afkDatabaseManager::isExempt)
+                    .thenCombineAsync(playerIdFuture, (isExempt, uuid) -> new ExemptFutureModel(uuid, isExempt))
+                    .thenComposeAsync(whitelistExemptFutureModel -> {
+                        if (whitelistExemptFutureModel.getIsExempt()) {
+                            // Exempt
+                            if (command.equalsIgnoreCase("add")) {
+                                this.plugin.getServer().getScheduler().runTask(this.plugin,
+                                        () -> sender.sendMessage(ChatColor.RED + target + " is already AFK Kick exempt"));
+                                return new CompletableFuture<>();
+                            }
+
+                            this.plugin.getServer().getScheduler().runTask(this.plugin,
+                                    () -> sender.sendMessage(ChatColor.GREEN + target + " was removed from the AFK Kick exempt list"));
+                            return afkDatabaseManager.remove(whitelistExemptFutureModel.getPlayerId());
+                        } else {
+                            // Not exempt
+                            if (command.equalsIgnoreCase("add")) {
+                                this.plugin.getServer().getScheduler().runTask(this.plugin,
+                                        () -> sender.sendMessage(ChatColor.GREEN + target + " was added to AFK Kick exempt list"));
+                                return afkDatabaseManager.add(whitelistExemptFutureModel.getPlayerId());
+                            }
+
+                            this.plugin.getServer().getScheduler().runTask(this.plugin,
+                                    () -> sender.sendMessage(ChatColor.RED + target + " is not AFK Kick exempt"));
+                            return new CompletableFuture<>();
+                        }
+                    });
         }
 
         return true;
-    }
-
-    private void queueSendMessageSync(@NotNull CommandSender sender, @NotNull String message) {
-        this.plugin.getServer().getScheduler().runTask(this.plugin, () -> sender.sendMessage(message));
     }
 }

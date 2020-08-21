@@ -1,6 +1,6 @@
 package dev.kylejulian.tws.commands;
 
-import dev.kylejulian.tws.commands.models.WhitelistExemptFutureModel;
+import dev.kylejulian.tws.commands.models.ExemptFutureModel;
 import dev.kylejulian.tws.data.MojangApi;
 import dev.kylejulian.tws.data.entities.EntityExemptList;
 import dev.kylejulian.tws.data.interfaces.IExemptDatabaseManager;
@@ -98,7 +98,7 @@ public class WhitelistExemptCommand implements CommandExecutor {
 
             playerIdFuture
                     .thenComposeAsync(whitelistExemptDatabaseManager::isExempt)
-                    .thenCombineAsync(playerIdFuture, (isExempt, uuid) -> new WhitelistExemptFutureModel(uuid, isExempt))
+                    .thenCombineAsync(playerIdFuture, (isExempt, uuid) -> new ExemptFutureModel(uuid, isExempt))
                     .thenComposeAsync(whitelistExemptFutureModel -> {
                         if (whitelistExemptFutureModel.getIsExempt()) {
                             // Exempt
