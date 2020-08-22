@@ -21,20 +21,10 @@ shadowJar {
 repositories {
     jcenter()
 
-    maven {
-		name = 'MinecraftPackages'
-        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
-        content {
-			includeGroup 'org.bukkit'
-			includeGroup 'org.spigotmc'
-       }
-    }
-    
+    maven { url 'https://papermc.io/repo/repository/maven-public/' }
   	maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
   	maven { url = 'https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core' }
   	maven { url = 'https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2' }
-  	 
-  	mavenLocal() // This is needed for CraftBukkit and Spigot.
 }
 
 dependencies {
@@ -48,11 +38,10 @@ dependencies {
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
     
-    compileOnly files('lib/TABv2.8.1.jar')
+    compileOnly files('lib/TABv2.8.4.jar')
     compileOnly 'net.luckperms:api:5.0'
     compileOnly 'org.jetbrains:annotations:19.0.0'
-
-  	compileOnly 'org.spigotmc:spigot-api:1.16.1-R0.1-SNAPSHOT'
+    compileOnly 'com.destroystokyo.paper:paper-api:1.16.2-R0.1-SNAPSHOT'
 }
 
 publishing {
