@@ -59,6 +59,6 @@ To run this plugin you must have the following dependencies also running on your
 
 To build this you will need to download the dependencies (not hosted in a repository) to a folder `lib`. This folder must exist at the root of the project. You will need to download the following dependencies from SpigotMC:
 
-1. [TAB v2.8.1](https://www.spigotmc.org/resources/tab-1-5-x-1-16-1-rgb-support.57806/update?update=343537)
+1. [TAB v2.8.4](https://www.spigotmc.org/resources/tab-1-5-x-1-16-2.57806/update?update=354249)
 
 After downloading the dependencies, move them to the `lib` folder and rename them as they are found in the `build.gradle` file.
