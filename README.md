@@ -29,6 +29,11 @@ This plugin has a variety of bespoke features intended for the use of TWS Server
   - Players who have enabled the HUD are stored in a local SQLite database
 - Add automatic unwhitelisting of players who are inactive for a configurable [config.json](https://github.com/kylejulian98/tws.management/blob/master/src/main/resources/config.json#L17) amount of days and hours.
   - If a player is inactive for more than the combined duration (days + hours) they will be removed from the server whitelist
+  - If the player is due to be unwhitelisted, they can be made exempt through granting them a permission node `tws.exempt.auto` or using the in-game commands (see below).
+- To add Players to the exempt list for the auto unwhitelisting, you can use the in-game commands below:
+  - `/exe list`
+  - `/exe add <PlayerName>`
+  - `/exe remove <PlayerName>`
 
 This plugin maintains a local SQLite database which persists information used by some of the provided features. This is found under: `/plugins/tws.management/tws-local.db`.
 
