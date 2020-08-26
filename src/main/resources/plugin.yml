@@ -33,3 +33,5 @@ permissions:
       tws.afk.exempt: true
   tws.afk.exempt:
     description: Gives access to add and remove players to the inactivity kick exempt list.
+  tws.exe.auto:
+    description: A player with this permission node will not be removed from the whitelisted automatically
