@@ -18,7 +18,7 @@ import dev.kylejulian.tws.data.sqlite.WhitelistDatabaseManager;
 import dev.kylejulian.tws.player.PlayerListener;
 import dev.kylejulian.tws.player.hud.HudListener;
 import dev.kylejulian.tws.server.whitelist.WhitelistRunnable;
-import dev.kylejulian.tws.world.DaytimeListener;
+import dev.kylejulian.tws.world.PlayerEventsListener;
 import org.apache.commons.lang.time.StopWatch;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -71,7 +71,7 @@ public class ManagementPlugin extends JavaPlugin {
 		this.getServer().getPluginManager().registerEvents(new PlayerListener(this, afkDatabaseManager,
 				hudDatabaseManager, this.configManager), this);
 		this.getServer().getPluginManager().registerEvents(new AfkEventListener(this, afkConfig), this);
-		this.getServer().getPluginManager().registerEvents(new DaytimeListener(this, nightResetConfig), this);
+		this.getServer().getPluginManager().registerEvents(new PlayerEventsListener(this, nightResetConfig), this);
 		this.getServer().getPluginManager().registerEvents(new HudListener(this, hudConfig), this);
 
 		this.getLogger().log(Level.INFO, "Plugin Events have been registered by {0}ms", stopWatch.getTime());
