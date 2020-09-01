@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
 public class ManagementPlugin extends JavaPlugin {
@@ -64,10 +65,8 @@ public class ManagementPlugin extends JavaPlugin {
 
 		this.getLogger().log(Level.INFO, "Internal dependencies have been created by {0}ms", stopWatch.getTime());
 
-		runDefaultSchemaSetup(new IDatabaseManager[] {afkDatabaseManager, hudDatabaseManager, whitelistExemptDatabaseManager} );
+		runDefaultSchemaSetup(new IDatabaseManager[] {afkDatabaseManager, hudDatabaseManager, whitelistExemptDatabaseManager }, stopWatch);
 
-		this.getLogger().log(Level.INFO, "Database schemas have been validated by {0}ms", stopWatch.getTime());
-		
 		this.getServer().getPluginManager().registerEvents(new PlayerListener(this, afkDatabaseManager,
 				hudDatabaseManager, this.configManager), this);
 		this.getServer().getPluginManager().registerEvents(new AfkEventListener(this, afkConfig), this);
@@ -104,11 +103,15 @@ public class ManagementPlugin extends JavaPlugin {
 		this.getLogger().log(Level.INFO, "Plugin stopped in {0}ms", stopWatch.getTime());
 	}
 
-	private void runDefaultSchemaSetup(@NotNull IDatabaseManager[] databaseManagers) {
-		CompletableFuture<?>[] completableFutures = new CompletableFuture<?>[databaseManagers.length];
-    	for (int i = 0; i < databaseManagers.length; i++) {
-			completableFutures[i] = databaseManagers[i].setupDefaultSchema();
+	private void runDefaultSchemaSetup(@NotNull IDatabaseManager[] databaseManagers, StopWatch stopWatch) {
+		for (IDatabaseManager databaseManager : databaseManagers) {
+			try {
+				databaseManager.setupDefaultSchema().get();
+				this.getLogger().log(Level.INFO, "{0} have been verified by {1}ms", new Object[] { databaseManager.getClass().getSimpleName(), stopWatch.getTime() });
+			} catch (InterruptedException | ExecutionException e) {
+				this.getLogger().log(Level.SEVERE, "Unable to setup Database Schemas, plugin may not work as expected. Disabling plugin.");
+				this.getServer().getPluginManager().disablePlugin(this);
+			}
 		}
-    	CompletableFuture.allOf(completableFutures);
 	}
 }
