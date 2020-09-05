@@ -44,8 +44,12 @@ jobs:
         release_name: Release ${{ github.ref }}
         draft: true
         
-    - name: Echo Version Number
-      run: find ${{ github.workspace }}/build/libs -name TWSManagement\*
+    - name: Find Asset Details
+      run: |
+        assetPath=find ${{ github.workspace }}/build/libs -name TWSManagement\*
+        assetName=basename -a $assetPath
+        echo $assetPath
+        echo $assetName
 
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1
@@ -53,6 +57,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{ github.workspace }}/build/libs/TWSManagement.jar
-        asset_name: TWSManagement.jar
+        asset_path: $assetPath
+        asset_name: $assetName
         asset_content_type: application/java-archive
