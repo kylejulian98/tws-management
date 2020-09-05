@@ -46,10 +46,8 @@ jobs:
         
     - name: Find Asset Details
       run: |
-        assetPath=$(find ${{ github.workspace }}/build/libs -name TWSManagement\*)
-        assetName=$(basename -a $assetPath)
-        echo '::set-env name=ASSET_PATH::$assetPath'
-        echo '::set-env name=ASSET_NAME::$assetName'
+        echo '::set-env name=ASSET_PATH::$(find ${{ github.workspace }}/build/libs -name TWSManagement\*)'
+        echo '::set-env name=ASSET_NAME::$(basename -a $assetPath)'
 
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1
