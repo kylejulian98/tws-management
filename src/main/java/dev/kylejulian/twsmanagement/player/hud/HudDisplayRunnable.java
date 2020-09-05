@@ -53,6 +53,6 @@ public class HudDisplayRunnable extends BukkitRunnable {
         baseComponent.addExtra(new TextComponent(orientationFormatted));
         baseComponent.addExtra(new TextComponent(timeFormatted));
 
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, baseComponent);
+        player.sendActionBar(baseComponent);
     }
 }

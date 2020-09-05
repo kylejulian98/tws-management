@@ -118,7 +118,7 @@ public class WhitelistRunnable implements Runnable {
             if (result) { // Player has Permission
                 return playerWhitelisted;
             } else {
-                long lastPlayTime = whitelistedPlayer.getLastPlayed();
+                long lastPlayTime = whitelistedPlayer.getLastLogin();
 
                 // If Player is exempt in database
 
