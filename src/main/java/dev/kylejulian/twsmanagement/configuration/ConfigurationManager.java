@@ -2,9 +2,11 @@ package dev.kylejulian.twsmanagement.configuration;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.logging.Level;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -56,6 +58,7 @@ public class ConfigurationManager {
         }
 
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
         try {
             this.config = mapper.readValue(this.file, ConfigModel.class);
         } catch (IOException e) {
@@ -115,8 +118,8 @@ public class ConfigurationManager {
         if (configModel.getWhitelistConfig() == null) {
             WhitelistConfigModel whitelistConfigModel = new WhitelistConfigModel();
             whitelistConfigModel.setEnabled(true);
-            whitelistConfigModel.setDays(14);
-            whitelistConfigModel.setHours(0);
+            whitelistConfigModel.setInactivity(Duration.ofDays(14));
+            whitelistConfigModel.setCheck(Duration.ofMinutes(30));
 
             configModel.setWhitelistConfig(whitelistConfigModel);
             saveRequired = true;

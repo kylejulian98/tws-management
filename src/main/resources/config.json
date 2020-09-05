@@ -16,8 +16,8 @@
 	},
 	"whitelistConfig": {
 		"enabled": true,
-		"days": 14,
-		"hours": 0
+		"inactivity": "P14DT0S",
+		"check": "PT30M"
 	},
 	"databaseConfig": {
 		"name": "tws-local.db",

@@ -76,7 +76,7 @@ public class TWSManagement extends JavaPlugin {
 
 		this.getServer().getScheduler().runTaskTimerAsynchronously(this,
 				new WhitelistRunnable(this, whitelistConfig, whitelistExemptDatabaseManager),
-				0, 36000); //200
+				0, whitelistConfig.getCheck().getSeconds() * 20); //200
 
 		MojangApi mojangApi = new MojangApi(this.getLogger());
 		Objects.requireNonNull(this.getCommand("afk")).setExecutor(new AfkCommand(this, afkDatabaseManager, mojangApi));

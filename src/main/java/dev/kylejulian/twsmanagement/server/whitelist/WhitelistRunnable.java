@@ -9,6 +9,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -38,11 +39,9 @@ public class WhitelistRunnable implements Runnable {
             return;
         }
 
-        int noOfDays = this.whitelistConfigModel.getDays();
-        int noOfHours = this.whitelistConfigModel.getHours();
+        Duration inactivity = this.whitelistConfigModel.getInactivity();
         LocalDateTime now = LocalDateTime.now();
-//        LocalDateTime unwhitelistDate = now.minusSeconds(10);
-        LocalDateTime unwhitelistDate = now.minusDays(noOfDays).minusHours(noOfHours);
+        LocalDateTime unwhitelistDate = now.minus(inactivity);
 
         LuckPermsHelper luckPermsHelper = getLuckPermsHelper();
         Set<OfflinePlayer> whitelistedPlayers = this.plugin.getServer().getWhitelistedPlayers();
