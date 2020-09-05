@@ -2,22 +2,30 @@ package dev.kylejulian.twsmanagement.configuration;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Duration;
+
 public class WhitelistConfigModel {
 
     private boolean enabled;
-    private Integer days;
-    private Integer hours;
+    private Duration inactivity, check;
 
     public void setEnabled(boolean enabled) { this.enabled = enabled; }
 
-    public void setDays(@NotNull Integer days) { this.days = days; }
+    public void setInactivity(@NotNull Duration duration) { this.inactivity = duration; }
 
-    public void setHours(@NotNull Integer hours) { this.hours = hours; }
+    /**
+     * Sets how often the Whitelist check is performed
+     * @param duration
+     */
+    public void setCheck(@NotNull Duration duration) { this.check = duration; }
 
     public boolean getEnabled() { return this.enabled; }
 
-    public @NotNull Integer getDays() { return this.days; }
+    public @NotNull Duration getInactivity() { return this.inactivity; }
 
-    public @NotNull Integer getHours() { return this.hours; }
-
+    /**
+     * How often the Whitelist check is performed
+     * @return Duration between checks
+     */
+    public @NotNull Duration getCheck() { return this.check; }
 }
