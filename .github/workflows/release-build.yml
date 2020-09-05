@@ -46,8 +46,8 @@ jobs:
         
     - name: Find Asset Details
       run: |
-        assetPath=find ${{ github.workspace }}/build/libs -name TWSManagement\*
-        assetName=basename -a $assetPath
+        assetPath=$(find ${{ github.workspace }}/build/libs -name TWSManagement\*)
+        assetName=$(basename -a $assetPath)
         echo $assetPath
         echo $assetName
 
