@@ -29,20 +29,20 @@ jobs:
       run: ./gradlew build -Pver=${GITHUB_REF/refs\/tags\//} release
 
     - name: Upload artifact
-        uses: actions/upload-artifact@v2.1.4
-        with:
-          name: Compiled Jar(s)
-          path: ${{ github.workspace }}/build/libs/
+      uses: actions/upload-artifact@v2.1.4
+      with:
+        name: Compiled Jar(s)
+        path: ${{ github.workspace }}/build/libs/
 
     - name: Draft Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: true
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: true
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
