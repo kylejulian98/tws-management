@@ -1,47 +1,76 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:6.0.0'
-    }
+import java.text.SimpleDateFormat
+
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '6.0.0'
 }
 
-apply plugin: 'java'
-apply plugin: 'java-library'
-apply plugin: 'maven-publish'
-apply plugin: 'com.github.johnrengelman.shadow'
+group = "dev.kylejulian.twsmanagement"
 
-shadowJar {
-	archiveBaseName = 'TWSManagement'
-	archiveClassifier = null
-	archiveVersion = '1.0.0'
+if (hasProperty('ver')) {
+    version = ver.substring(1)
+} else {
+    SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd-HHmm")
+    sdf.setTimeZone(TimeZone.getTimeZone("UTC"))
+    version = sdf.format(new Date()).toString()
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 repositories {
-    jcenter()
+    mavenCentral()
 
-    maven { url 'https://papermc.io/repo/repository/maven-public/' }
-  	maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
-  	maven { url = 'https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core' }
-  	maven { url = 'https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2' }
+    maven {
+        name 'papermc'
+        url 'https://papermc.io/repo/repository/maven-public/'
+    }
+  	maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots'
+    }
+  	maven {
+        url 'https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core'
+    }
+  	maven {
+        url 'https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2'
+    }
 }
 
 dependencies {
-    api 'org.apache.commons:commons-math3:3.6.1'
-
-    implementation 'com.google.guava:guava:28.0-jre'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.10.3'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.10.3'
     implementation 'org.apache.commons:commons-dbcp2:2.7.0' // Connection Pooling
-    
-    // Use JUnit test framework
-    testImplementation 'junit:junit:4.12'
     
     compileOnly files('lib/TABv2.8.4.jar')
     compileOnly 'net.luckperms:api:5.0'
     compileOnly 'org.jetbrains:annotations:19.0.0'
     compileOnly 'com.destroystokyo.paper:paper-api:1.16.2-R0.1-SNAPSHOT'
+}
+
+processResources {
+    filesMatching("**/plugin.yml") {
+        expand ( VERSION: version, PACKAGE: project.group.toString(), NAME: rootProject.name )
+    }
+}
+
+shadowJar {
+    archiveClassifier.set('SNAPSHOT')
+    relocate 'io.papermc.lib', 'shadow.io.papermc.lib'
+}
+
+jar.enabled = false
+assemble.dependsOn(shadowJar)
+
+task release {
+    dependsOn build
+    doLast {
+        def dirStr = buildDir.toString() + '/libs/'
+        file(dirStr + rootProject.name + '-' + version + '-SNAPSHOT.jar').renameTo(dirStr + rootProject.name + '.jar')
+    }
 }
 
 publishing {
@@ -58,9 +87,7 @@ publishing {
 
     publications {
         shadow(MavenPublication) { publication ->
-            groupId = 'dev.kylejulian.tws'
-            artifactId = 'TWSManagement'
-            version = '1.0.0'
+            version = version
             project.shadow.component(publication)
         }
     }

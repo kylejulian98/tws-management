@@ -1,7 +1,6 @@
-name: tws.management
-main: dev.kylejulian.tws.ManagementPlugin
-author: JuHDude
-version: 1.0.0
+main: ${PACKAGE}.${NAME}
+name: ${NAME}
+version: "${VERSION}"
 api-version: "1.16"
 database: true
 softdepend: [TAB, LuckPerms]
