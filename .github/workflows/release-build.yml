@@ -43,6 +43,9 @@ jobs:
         tag_name: ${{ github.ref }}
         release_name: Release ${{ github.ref }}
         draft: true
+        
+    - name: Echo Version Number
+      run: echo ${GITHUB_REF/refs\/tags\//}
 
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1
@@ -50,6 +53,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{ github.workspace }}/build/libs/TWSManagement-${GITHUB_REF/refs\/tags\//}.jar
+        asset_path: ${{ github.workspace }}/build/libs/TWSManagement.jar
         asset_name: TWSManagement.jar
         asset_content_type: application/java-archive
