@@ -44,12 +44,12 @@ jobs:
         release_name: Release ${{ github.ref }}
         draft: true
 
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/build/libs/TWSManagement.jar
-          asset_name: TWSManagement.jar
-          asset_content_type: application/java-archive
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ github.workspace }}/build/libs/TWSManagement.jar
+        asset_name: TWSManagement.jar
+        asset_content_type: application/java-archive
