@@ -13,6 +13,9 @@ import java.util.logging.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.kylejulian.twsmanagement.data.entities.MojangUserModel;
 import dev.kylejulian.twsmanagement.data.entities.MojangUserNameModel;
+import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class MojangApi {
 
@@ -24,7 +27,8 @@ public class MojangApi {
 		this.cachedIds = new HashMap<>();
 	}
 
-    public CompletableFuture<UUID> getPlayerId(String name) {
+	@NotNull
+    public CompletableFuture<UUID> getPlayerId(@NotNull String name) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				if (this.cachedIds.containsKey(name)) {
@@ -56,8 +60,8 @@ public class MojangApi {
 			return null;
 		});
 	}
-	
-	public CompletableFuture<String> getPlayerName(UUID playerId) {
+
+	public CompletableFuture<@Nullable Component> getPlayerName(@NotNull UUID playerId) {
 		return CompletableFuture.supplyAsync(() -> {
 			try
 			{
@@ -65,7 +69,7 @@ public class MojangApi {
 					for (Map.Entry<String, UUID> entry : this.cachedIds.entrySet()) {
 						if (entry.getValue().equals(playerId)) {
 							this.logger.log(Level.FINE, "[MojangApi] Cache hit");
-							return entry.getKey();
+							return Component.text(entry.getKey());
 						}
 					}
 				}
@@ -74,7 +78,8 @@ public class MojangApi {
 
 				String playerIdString = playerId.toString();
 
-				String url = "https://api.mojang.com/user/profiles/" + playerIdString.replace("-", "") + "/names";
+				String url = "https://api.mojang.com/user/profiles/" +
+						playerIdString.replace("-", "") + "/names";
 				URL obj = new URL(url);
 				HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
@@ -87,7 +92,7 @@ public class MojangApi {
 				String name = lastNameChanged.getName();
 				this.cachedIds.put(name, playerId);
 
-				return name;
+				return Component.text(name);
 			}
 			catch (IOException e) {
 				this.logger.log(Level.WARNING, "Unable to find PlayerId {0} from the Mojang Api", playerId);

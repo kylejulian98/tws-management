@@ -6,7 +6,7 @@ import dev.kylejulian.twsmanagement.data.MojangApi;
 import dev.kylejulian.twsmanagement.data.entities.EntityExemptList;
 import dev.kylejulian.twsmanagement.data.interfaces.IExemptDatabaseManager;
 import dev.kylejulian.twsmanagement.extensions.ExemptListChatHelpers;
-import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -26,24 +26,25 @@ public class AfkCommand implements CommandExecutor {
     private final IExemptDatabaseManager afkDatabaseManager;
     private final MojangApi mojangApi;
 
-    public AfkCommand(@NotNull JavaPlugin plugin, @NotNull IExemptDatabaseManager afkDatabaseManager, @NotNull MojangApi mojangApi) {
+    public AfkCommand(@NotNull JavaPlugin plugin, @NotNull IExemptDatabaseManager afkDatabaseManager,
+                      @NotNull MojangApi mojangApi) {
         this.plugin = plugin;
         this.afkDatabaseManager = afkDatabaseManager;
         this.mojangApi = mojangApi;
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label,
+                             String[] args) {
         if (args.length < 1) {
-            if (sender instanceof Player) {
-                Player player = (Player) sender;
-
+            if (sender instanceof Player player) {
                 AfkCommandEvent event = new AfkCommandEvent(player.getUniqueId());
                 Runnable afkEventTask = () -> this.plugin.getServer().getPluginManager().callEvent(event);
 
                 this.plugin.getServer().getScheduler().runTask(this.plugin, afkEventTask);
             } else {
-                this.plugin.getServer().getLogger().log(Level.WARNING, "You must be a Player to use this command!");
+                this.plugin.getServer().getLogger().log(Level.WARNING,
+                        "You must be a Player to use this command!");
             }
 
             return true;
@@ -80,7 +81,8 @@ public class AfkCommand implements CommandExecutor {
 
                 final int finalPageIndex = pageIndex;
                 int pageSize = 5;
-                CompletableFuture<EntityExemptList> getAfkExemptPlayers = this.afkDatabaseManager.getPlayers(pageIndex, pageSize);
+                CompletableFuture<EntityExemptList> getAfkExemptPlayers =
+                        this.afkDatabaseManager.getPlayers(pageIndex, pageSize);
 
                 getAfkExemptPlayers
                         .thenAcceptAsync(result -> {
@@ -93,14 +95,19 @@ public class AfkCommand implements CommandExecutor {
                             }
 
                             sender.sendMessage(ChatColor.YELLOW + "AFK Kick Exempt List");
-                            ExemptListChatHelpers exemptListChatHelpers = new ExemptListChatHelpers(this.plugin, this.mojangApi);
+                            ExemptListChatHelpers exemptListChatHelpers =
+                                    new ExemptListChatHelpers(this.plugin, this.mojangApi);
 
-                            ComponentBuilder baseMessage = exemptListChatHelpers.buildPaginationMessage(finalPageIndex, maxPages, "/afk exempt list", playerIds);
-                            sender.spigot().sendMessage(baseMessage.create());
+                            Component baseMessage = exemptListChatHelpers.buildPaginationMessage(finalPageIndex,
+                                    maxPages, "/afk exempt list", playerIds);
+
+                            sender.sendMessage(baseMessage);
 
                             if (!(sender instanceof Player) && finalPageIndex != maxPages) {
-                                sender.sendMessage(ChatColor.YELLOW + "To fetch the next page you need to use [" + ChatColor.GREEN + "/afk exempt list "
-                                        + (finalPageIndex + 1) + ChatColor.YELLOW + "]");
+                                sender.sendMessage(
+                                        ChatColor.YELLOW + "To fetch the next page you need to use [" +
+                                        ChatColor.GREEN + "/afk exempt list " + (finalPageIndex + 1) +
+                                        ChatColor.YELLOW + "]");
                             }
                         });
 
@@ -122,18 +129,21 @@ public class AfkCommand implements CommandExecutor {
                             // Exempt
                             if (command.equalsIgnoreCase("add")) {
                                 this.plugin.getServer().getScheduler().runTask(this.plugin,
-                                        () -> sender.sendMessage(ChatColor.RED + target + " is already AFK Kick exempt"));
+                                        () -> sender.sendMessage(ChatColor.RED + target +
+                                                " is already AFK Kick exempt"));
                                 return new CompletableFuture<>();
                             }
 
                             this.plugin.getServer().getScheduler().runTask(this.plugin,
-                                    () -> sender.sendMessage(ChatColor.GREEN + target + " was removed from the AFK Kick exempt list"));
+                                    () -> sender.sendMessage(ChatColor.GREEN + target +
+                                            " was removed from the AFK Kick exempt list"));
                             return afkDatabaseManager.remove(whitelistExemptFutureModel.getPlayerId());
                         } else {
                             // Not exempt
                             if (command.equalsIgnoreCase("add")) {
                                 this.plugin.getServer().getScheduler().runTask(this.plugin,
-                                        () -> sender.sendMessage(ChatColor.GREEN + target + " was added to AFK Kick exempt list"));
+                                        () -> sender.sendMessage(ChatColor.GREEN + target +
+                                                " was added to AFK Kick exempt list"));
                                 return afkDatabaseManager.add(whitelistExemptFutureModel.getPlayerId());
                             }
 

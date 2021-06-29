@@ -82,8 +82,8 @@ public class PlayerListener implements Listener {
 		}
 
 		// Only reset the Tab if they were actually AFK
-		if (TabPluginHelper.hasTabSuffix(this.plugin, playerId)) {
-			Runnable tabTask = () -> TabPluginHelper.setTabSuffix(this.plugin, playerId, ChatColor.RESET + "");
+		if (TabPluginHelper.hasTabSuffix(playerId)) {
+			Runnable tabTask = () -> TabPluginHelper.setTabSuffix(playerId, ChatColor.RESET + "");
 			this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, tabTask);
 		}
 
@@ -114,11 +114,11 @@ public class PlayerListener implements Listener {
 	public void onAfk(@NotNull AfkEvent e) {
 		UUID playerId = e.getPlayerId();
 
-		if (!TabPluginHelper.hasTabSuffix(this.plugin, playerId)) {
+		if (!TabPluginHelper.hasTabSuffix(playerId)) {
 			Player player = this.plugin.getServer().getPlayer(playerId);
 			if (player != null) {
 				player.sendMessage(ChatColor.DARK_RED + "You are now AFK");
-				Runnable tabTask = () -> TabPluginHelper.setTabSuffix(this.plugin, playerId, ChatColor.GRAY + "[" + ChatColor.RED + "AFK" + ChatColor.GRAY + "] " + ChatColor.RESET);
+				Runnable tabTask = () -> TabPluginHelper.setTabSuffix(playerId, ChatColor.GRAY + "[" + ChatColor.RED + "AFK" + ChatColor.GRAY + "] " + ChatColor.RESET);
 				this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, tabTask);
 			}
 		}

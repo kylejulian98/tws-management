@@ -5,6 +5,7 @@ import dev.kylejulian.twsmanagement.data.MojangApi;
 import dev.kylejulian.twsmanagement.data.entities.EntityExemptList;
 import dev.kylejulian.twsmanagement.data.interfaces.IExemptDatabaseManager;
 import dev.kylejulian.twsmanagement.extensions.ExemptListChatHelpers;
+import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -24,14 +25,19 @@ public class WhitelistExemptCommand implements CommandExecutor {
     private final IExemptDatabaseManager whitelistExemptDatabaseManager;
     private final MojangApi mojangApi;
 
-    public WhitelistExemptCommand(@NotNull JavaPlugin plugin, @NotNull IExemptDatabaseManager whitelistExemptDatabaseManager, @NotNull MojangApi mojangApi) {
+    public WhitelistExemptCommand(@NotNull JavaPlugin plugin,
+                                  @NotNull IExemptDatabaseManager whitelistExemptDatabaseManager,
+                                  @NotNull MojangApi mojangApi) {
         this.plugin = plugin;
         this.whitelistExemptDatabaseManager = whitelistExemptDatabaseManager;
         this.mojangApi = mojangApi;
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender,
+                             @NotNull Command cmd,
+                             @NotNull String label,
+                             String[] args) {
         if (args.length < 1) {
             sender.sendMessage(ChatColor.RED + "You need to specify a command add/remove/list");
             return true;
@@ -58,7 +64,8 @@ public class WhitelistExemptCommand implements CommandExecutor {
             final int finalPageIndex = pageIndex;
             final int pageSize = 5;
 
-            CompletableFuture<EntityExemptList> getAutoUnwhitelistExemptPlayers = this.whitelistExemptDatabaseManager.getPlayers(finalPageIndex, pageSize);
+            CompletableFuture<EntityExemptList> getAutoUnwhitelistExemptPlayers =
+                    this.whitelistExemptDatabaseManager.getPlayers(finalPageIndex, pageSize);
 
             getAutoUnwhitelistExemptPlayers.thenAcceptAsync(result -> {
                 ArrayList<UUID> playerIds = result.getPlayerIds();
@@ -72,12 +79,13 @@ public class WhitelistExemptCommand implements CommandExecutor {
                 sender.sendMessage(ChatColor.YELLOW + "Auto Unwhitelist Exempt List");
                 ExemptListChatHelpers exemptListChatHelpers = new ExemptListChatHelpers(this.plugin, this.mojangApi);
 
-                ComponentBuilder baseMessage = exemptListChatHelpers.buildPaginationMessage(finalPageIndex, maxPages, "/exe list", playerIds);
-                sender.spigot().sendMessage(baseMessage.create());
+                Component baseMessage = exemptListChatHelpers.buildPaginationMessage(finalPageIndex, maxPages,
+                        "/exe list", playerIds);
+                sender.sendMessage(baseMessage);
 
                 if (!(sender instanceof Player) && finalPageIndex != maxPages) {
-                    sender.sendMessage(ChatColor.YELLOW + "To fetch the next page you need to use [" + ChatColor.GREEN + "/exe list " +
-                            (finalPageIndex + 1) + ChatColor.YELLOW + "]");
+                    sender.sendMessage(ChatColor.YELLOW + "To fetch the next page you need to use [" +
+                            ChatColor.GREEN + "/exe list " + (finalPageIndex + 1) + ChatColor.YELLOW + "]");
                 }
             });
 
@@ -104,23 +112,27 @@ public class WhitelistExemptCommand implements CommandExecutor {
                             // Exempt
                             if (command.equalsIgnoreCase("add")) {
                                 this.plugin.getServer().getScheduler().runTask(this.plugin,
-                                        () -> sender.sendMessage(ChatColor.RED + target + " is already auto unwhitelist exempt"));
+                                        () -> sender.sendMessage(ChatColor.RED + target +
+                                                " is already auto unwhitelist exempt"));
                                 return new CompletableFuture<>();
                             }
 
                             this.plugin.getServer().getScheduler().runTask(this.plugin,
-                                    () -> sender.sendMessage(ChatColor.GREEN + target + " was removed from the auto unwhitelist exempt list"));
+                                    () -> sender.sendMessage(ChatColor.GREEN + target +
+                                            " was removed from the auto unwhitelist exempt list"));
                             return whitelistExemptDatabaseManager.remove(whitelistExemptFutureModel.getPlayerId());
                         } else {
                             // Not exempt
                             if (command.equalsIgnoreCase("add")) {
                                 this.plugin.getServer().getScheduler().runTask(this.plugin,
-                                        () -> sender.sendMessage(ChatColor.GREEN + target + " was added to auto unwhitelist exempt list"));
+                                        () -> sender.sendMessage(ChatColor.GREEN + target +
+                                                " was added to auto unwhitelist exempt list"));
                                 return whitelistExemptDatabaseManager.add(whitelistExemptFutureModel.getPlayerId());
                             }
 
                             this.plugin.getServer().getScheduler().runTask(this.plugin,
-                                    () -> sender.sendMessage(ChatColor.RED + target + " is not auto unwhitelist exempt"));
+                                    () -> sender.sendMessage(ChatColor.RED + target +
+                                            " is not auto unwhitelist exempt"));
                             return new CompletableFuture<>();
                         }
                     });

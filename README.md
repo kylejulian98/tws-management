@@ -15,9 +15,9 @@ This plugin has a variety of bespoke features intended for the use of TWS Server
   - AFK players are shown as AFK in the tab menu (if you have the TAB plugin installed, [see below](README.md#Requirements))
 - Ability to kick an afk player after a configurable [config.json](https://github.com/kylejulian98/tws.management/blob/master/src/main/resources/config.json#L4) of time
 - Ability to add Players to an AFK Kick exempt list, stored in a local SQLite database - The in-game commands for this feature are listed below:
-    - `/afk exempt list`
-    - `/afk exempt add <PlayerName>`
-    - `/afk exempt remove <PlayerName>`
+  - `/afk exempt list`
+  - `/afk exempt add <PlayerName>`
+  - `/afk exempt remove <PlayerName>`
 - Automatically set night to day if the following conditions are met:
   - It is currently night time (in game)
   - All remaining players are AFK
@@ -39,7 +39,7 @@ This plugin maintains a local SQLite database which persists information used by
 
 ### Running the Plugin
 
-This plugin runs on Minecraft SpigotMC 1.6.1. You can download the latest version of the plugin jar through navigating the Packages section of this github repository, or using the following link [packages](https://github.com/kylejulian98/tws.management/packages).
+This plugin runs on Minecraft Purpur 1.17. You can download the latest version of the plugin jar through navigating the Packages section of this github repository, or using the following link [packages](https://github.com/kylejulian98/tws.management/packages).
 
 #### Requirements
 
@@ -52,13 +52,3 @@ To run this plugin you must have the following dependencies also running on your
 
 - ❓ [TAB](https://www.spigotmc.org/resources/tab-1-5-x-1-16-1-rgb-support.57806/) - Displays the AFK suffix tag next to your name, in the tab leaderboard.
 - ❓ [LuckPerms](https://www.spigotmc.org/resources/luckperms.28140/) - Used when checking if players have a permission node when automatically unwhitelisting.
-
-## Developers
-
-### Build
-
-To build this you will need to download the dependencies (not hosted in a repository) to a folder `lib`. This folder must exist at the root of the project. You will need to download the following dependencies from SpigotMC:
-
-1. [TAB v2.8.4](https://www.spigotmc.org/resources/tab-1-5-x-1-16-2.57806/update?update=354249)
-
-After downloading the dependencies, move them to the `lib` folder and rename them as they are found in the `build.gradle` file.

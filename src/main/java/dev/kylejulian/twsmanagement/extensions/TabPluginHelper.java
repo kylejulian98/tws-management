@@ -1,33 +1,25 @@
 package dev.kylejulian.twsmanagement.extensions;
 
 import java.util.UUID;
-import java.util.logging.Level;
 
-import org.bukkit.plugin.java.JavaPlugin;
+import me.neznamy.tab.api.EnumProperty;
+import me.neznamy.tab.api.TabPlayer;
+import me.neznamy.tab.api.TABAPI;
+import org.jetbrains.annotations.NotNull;
 
 public class TabPluginHelper {
 
-	public static void setTabSuffix(JavaPlugin plugin, UUID playerId, String message) {
-		try {
-			Class.forName("me.neznamy.tab.api.TABAPI");
-			me.neznamy.tab.api.EnumProperty type = me.neznamy.tab.api.EnumProperty.TABSUFFIX;
-			me.neznamy.tab.api.TABAPI.setValueTemporarily(playerId, type, message);
-		} catch (ClassNotFoundException e) {
-			plugin.getServer().getLogger().log(Level.WARNING, "Unable to set TAB Suffix for Player [" + playerId + "]");
-			plugin.getServer().getLogger().log(Level.WARNING, e.getMessage());
-		}
+	public static void setTabSuffix(@NotNull UUID playerId, @NotNull String message) {
+		EnumProperty type = EnumProperty.TABSUFFIX;
+		TabPlayer player = TABAPI.getPlayer(playerId);
+		player.setValueTemporarily(type, message);
 	}
 
-	public static boolean hasTabSuffix(JavaPlugin plugin, UUID playerId) {
-		String suffix = null;
-		try {
-			Class.forName("me.neznamy.tab.api.TABAPI");
-			me.neznamy.tab.api.EnumProperty type = me.neznamy.tab.api.EnumProperty.TABSUFFIX;
-			suffix = me.neznamy.tab.api.TABAPI.getTemporaryValue(playerId, type);
-		} catch (ClassNotFoundException e) {
-			plugin.getServer().getLogger().log(Level.WARNING, "Unable to get TAB Suffix for Player [" + playerId + "]");
-			plugin.getServer().getLogger().log(Level.WARNING, e.getMessage());
-		}
+	public static boolean hasTabSuffix(@NotNull UUID playerId) {
+		EnumProperty type = EnumProperty.TABSUFFIX;
+		TabPlayer player = TABAPI.getPlayer(playerId);
+		String suffix = player.getTemporaryValue(type);
+
 		return suffix != null && suffix.contains("AFK");
 	}
 }
