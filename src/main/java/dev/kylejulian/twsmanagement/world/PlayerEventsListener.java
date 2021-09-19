@@ -95,8 +95,10 @@ public class PlayerEventsListener implements Listener {
                 UUID worldId = world.getUID();
                 tryStopNightSkipTasks(worldId);
 
-                AccelerateNightTimeRunnable accelerateNightTimeRunnable = new AccelerateNightTimeRunnable(this.plugin, worldId);
-                BukkitTask accelerateNightTask = accelerateNightTimeRunnable.runTaskTimer(this.plugin, 0, 1);
+                AccelerateNightTimeRunnable accelerateNightTimeRunnable =
+                        new AccelerateNightTimeRunnable(this.plugin, worldId);
+                BukkitTask accelerateNightTask =
+                        accelerateNightTimeRunnable.runTaskTimer(this.plugin, 0, 1);
                 this.accelerateNightTasks.put(worldId, accelerateNightTask.getTaskId());
             }
         }

@@ -34,8 +34,10 @@ public class PlayerListener implements Listener {
 	private final ConfigurationManager configManager;
 	private final HashMap<UUID,Integer> playerAfkManagerTasks;
 	
-	public PlayerListener(@NotNull JavaPlugin plugin, @NotNull IExemptDatabaseManager afkDatabaseManager,
-						  @NotNull IHudDatabaseManager hudDatabaseManager, @NotNull ConfigurationManager configManager) {
+	public PlayerListener(@NotNull JavaPlugin plugin,
+						  @NotNull IExemptDatabaseManager afkDatabaseManager,
+						  @NotNull IHudDatabaseManager hudDatabaseManager,
+						  @NotNull ConfigurationManager configManager) {
 		this.plugin = plugin;
 		this.afkDatabaseManager = afkDatabaseManager;
 		this.hudDatabaseManager = hudDatabaseManager;
@@ -100,14 +102,17 @@ public class PlayerListener implements Listener {
 			this.plugin.getServer().getScheduler().cancelTask(taskId);
 		}
 
-		taskId = this.createAndStartAfkManagerTask(playerId, true); // Player triggered this AFK event, they are already AFK
+		// Player triggered this AFK event, they are already AFK
+		taskId = this.createAndStartAfkManagerTask(playerId, true);
 		this.playerAfkManagerTasks.put(playerId, taskId);
 		
-		// Raise new AFK Event, as the AFKManager will not raise another due to the alreadyAfk being set to true property
+		// Raise new AFK Event, as the AFKManager will not raise another due to the
+		// alreadyAfk being set to true property
 		// This is so the Plugin will kick the Player after the configurable kick time has elapsed
 		AfkEvent event = new AfkEvent(playerId);
 		Runnable afkEventTask = () -> this.plugin.getServer().getPluginManager().callEvent(event);
-		this.plugin.getServer().getScheduler().runTask(this.plugin, afkEventTask); // Cannot raise a new event asynchronously
+		// Cannot raise a new event asynchronously
+		this.plugin.getServer().getScheduler().runTask(this.plugin, afkEventTask);
 	}
 	
 	@EventHandler
@@ -118,7 +123,9 @@ public class PlayerListener implements Listener {
 			Player player = this.plugin.getServer().getPlayer(playerId);
 			if (player != null) {
 				player.sendMessage(ChatColor.DARK_RED + "You are now AFK");
-				Runnable tabTask = () -> TabPluginHelper.setTabSuffix(playerId, ChatColor.GRAY + "[" + ChatColor.RED + "AFK" + ChatColor.GRAY + "] " + ChatColor.RESET);
+				Runnable tabTask = () -> TabPluginHelper.setTabSuffix(playerId,
+						ChatColor.GRAY + "[" + ChatColor.RED + "AFK" + ChatColor.GRAY + "] " +
+								ChatColor.RESET);
 				this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, tabTask);
 			}
 		}
@@ -144,9 +151,12 @@ public class PlayerListener implements Listener {
 		ConfigModel config = this.configManager.getConfig();
 		AfkConfigModel afkConfig = config.getAfkConfig();
 		
-		Runnable playerAfkManager = new AfkManager(this.plugin, this.afkDatabaseManager, afkConfig, playerId, alreadyAfk);
+		Runnable playerAfkManager =
+				new AfkManager(this.plugin, this.afkDatabaseManager, afkConfig, playerId, alreadyAfk);
+
+		// 1200 ticks = 60 seconds
 		BukkitTask afkTimerTask = this.plugin.getServer().getScheduler()
-				.runTaskTimerAsynchronously(this.plugin, playerAfkManager, 1200, 1200); // 1200 ticks = 60 seconds
+				.runTaskTimerAsynchronously(this.plugin, playerAfkManager, 1200, 1200);
 		
 		return afkTimerTask.getTaskId();
 	}

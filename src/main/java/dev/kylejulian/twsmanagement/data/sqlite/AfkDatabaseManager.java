@@ -24,9 +24,13 @@ public class AfkDatabaseManager extends DatabaseManager implements IExemptDataba
 
 	@Override
 	public @NotNull CompletableFuture<Void> setupDefaultSchema() {
-		final String sqlCommand = "CREATE TABLE IF NOT EXISTS afk_kick_exempt (id INTEGER PRIMARY KEY NOT NULL, player_uuid UUID NOT NULL)";
-		final String sqlIndexCommand = "CREATE UNIQUE INDEX IF NOT EXISTS idx_afk_kick_exempt_id ON afk_kick_exempt (id)";
-		final String sqlPlayerIdIndexCommand = "CREATE UNIQUE INDEX IF NOT EXISTS idx_afk_kick_exempt_player_uuid ON afk_kick_exempt (player_uuid)";
+		final String sqlCommand =
+				"CREATE TABLE IF NOT EXISTS afk_kick_exempt " +
+						"(id INTEGER PRIMARY KEY NOT NULL, player_uuid UUID NOT NULL)";
+		final String sqlIndexCommand =
+				"CREATE UNIQUE INDEX IF NOT EXISTS idx_afk_kick_exempt_id ON afk_kick_exempt (id)";
+		final String sqlPlayerIdIndexCommand =
+				"CREATE UNIQUE INDEX IF NOT EXISTS idx_afk_kick_exempt_player_uuid ON afk_kick_exempt (player_uuid)";
 
 		return CompletableFuture.runAsync(() -> {
 			try (Connection connection = this.getConnection();
@@ -207,5 +211,10 @@ public class AfkDatabaseManager extends DatabaseManager implements IExemptDataba
 
 			return result;
 		});
+	}
+
+	@Override
+	public @NotNull CompletableFuture<Void> clear() {
+		return this.execute("DELETE FROM afk_kick_exempt", new Object[0]);
 	}
 }

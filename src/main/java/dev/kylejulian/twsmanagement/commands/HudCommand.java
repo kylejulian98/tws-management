@@ -12,10 +12,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-public class HudCommand implements CommandExecutor {
-
-    private final JavaPlugin plugin;
-    private final IHudDatabaseManager hudDatabaseManager;
+public record HudCommand(JavaPlugin plugin,
+                         IHudDatabaseManager hudDatabaseManager) implements CommandExecutor {
 
     public HudCommand(@NotNull final JavaPlugin plugin, @NotNull final IHudDatabaseManager hudDatabaseManager) {
         this.plugin = plugin;
@@ -23,7 +21,8 @@ public class HudCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
+                             @NotNull String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             final UUID playerId = player.getUniqueId();
@@ -52,7 +51,7 @@ public class HudCommand implements CommandExecutor {
      * Raises a Event to trigger Hud event service
      *
      * @param playerId Player whom triggered the event
-     * @param enabled To indicate if a player wants the Hud to be visible or not
+     * @param enabled  To indicate if a player wants the Hud to be visible or not
      */
     private void raiseHudEvent(@NotNull final UUID playerId, final boolean enabled) {
         Runnable runnable = () -> plugin.getServer().getPluginManager().callEvent(new HudEvent(playerId, enabled));

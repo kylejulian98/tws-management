@@ -9,7 +9,9 @@ public class DatabaseConfigModel {
 		this.name = name;
 	}
 
-	public void setMaxConcurrentConnections(int maxConcurrentConnections) { this.maxConcurrentConnections = maxConcurrentConnections; }
+	public void setMaxConcurrentConnections(int maxConcurrentConnections) {
+		this.maxConcurrentConnections = maxConcurrentConnections;
+	}
 
 	public String getName() {
 		return this.name;

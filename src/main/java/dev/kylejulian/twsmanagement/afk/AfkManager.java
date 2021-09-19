@@ -29,9 +29,11 @@ public class AfkManager implements Runnable {
 	 * @param afkDatabase AFK Database Manager
 	 * @param afkConfig Configuration for AFK
 	 * @param playerId Player whom this AFK Manager belongs to
-	 * @param alreadyAfk Boolean flag to indicate whether or not the Player was already AFK when this AFK Manager was created
+	 * @param alreadyAfk Boolean flag to indicate whether or not the Player was already AFK when this A
+	 *                      FK Manager was created
 	 */
-	public AfkManager(JavaPlugin plugin, IExemptDatabaseManager afkDatabase, AfkConfigModel afkConfig, UUID playerId, boolean alreadyAfk) {
+	public AfkManager(JavaPlugin plugin, IExemptDatabaseManager afkDatabase, AfkConfigModel afkConfig, UUID playerId,
+					  boolean alreadyAfk) {
 		this.plugin = plugin;
 		this.afkDatabase = afkDatabase;
 		this.afkConfig = afkConfig;
@@ -54,7 +56,8 @@ public class AfkManager implements Runnable {
 		if (!this.alreadyAfk && this.getPlayerAfkMinutes() == afkTime) { // Player is AFK
 			AfkEvent event = new AfkEvent(this.playerId);
 			
-			this.plugin.getServer().getScheduler().runTask(this.plugin, () -> this.plugin.getServer().getPluginManager().callEvent(event));
+			this.plugin.getServer().getScheduler()
+					.runTask(this.plugin, () -> this.plugin.getServer().getPluginManager().callEvent(event));
 		}
 
 		CompletableFuture<Boolean> isPlayerAfkKickExemptFuture = this.afkDatabase.isExempt(playerId);
@@ -62,14 +65,16 @@ public class AfkManager implements Runnable {
 			if (!result) { // Player is not Kick exempt
 				if (canKickPlayer(afkKickTime, afkTime)) {
 					// Player must be kicked synchronously
-					plugin.getServer().getScheduler().runTask(this.plugin, () -> player.kickPlayer(afkConfig.getKickMessage()));
+					plugin.getServer().getScheduler()
+							.runTask(this.plugin, () -> player.kickPlayer(afkConfig.getKickMessage()));
 				}
 			}
 		});
 	}
 	
 	private boolean canKickPlayer(int afkKickTime, int afkTime) {
-		if (this.getPlayerAfkMinutes() >= (afkKickTime + afkTime)) { // Player has to be inactive for both the AFK time and AFK Kick time
+		// Player has to be inactive for both the AFK time and AFK Kick time
+		if (this.getPlayerAfkMinutes() >= (afkKickTime + afkTime)) {
 			int numberOfPlayersOnline = this.plugin.getServer().getOnlinePlayers().size(); 
 			int numberOfRequiredPlayersToKick = this.afkConfig.getPlayerCountNeededForKick();
 

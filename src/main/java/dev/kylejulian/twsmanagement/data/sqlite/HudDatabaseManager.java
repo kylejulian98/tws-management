@@ -22,16 +22,20 @@ public class HudDatabaseManager extends DatabaseManager implements IHudDatabaseM
 
     @Override
     public @NotNull CompletableFuture<Void> setupDefaultSchema() {
-        final String sqlCommand = "CREATE TABLE IF NOT EXISTS hud (id INTEGER PRIMARY KEY NOT NULL, player_uuid UUID NOT NULL)";
-        final String sqlIndexCommand = "CREATE UNIQUE INDEX IF NOT EXISTS idx_hud_id ON hud (id)";
-        final String sqlPlayerIdIndexCommand = "CREATE UNIQUE INDEX IF NOT EXISTS idx_hud_player_uuid ON hud (player_uuid)";
+        final String sqlCommand =
+                "CREATE TABLE IF NOT EXISTS hud (id INTEGER PRIMARY KEY NOT NULL, player_uuid UUID NOT NULL)";
+        final String sqlIndexCommand =
+                "CREATE UNIQUE INDEX IF NOT EXISTS idx_hud_id ON hud (id)";
+        final String sqlPlayerIdIndexCommand =
+                "CREATE UNIQUE INDEX IF NOT EXISTS idx_hud_player_uuid ON hud (player_uuid)";
 
         return CompletableFuture.runAsync(() -> {
             try (Connection connection = this.getConnection();
                  PreparedStatement statement = connection.prepareStatement(sqlCommand)) {
                 statement.execute();
             } catch (SQLException e) {
-                this.getPlugin().getLogger().log(Level.WARNING, "Unable to setup Default Schema for Hud Database table.");
+                this.getPlugin().getLogger().log(Level.WARNING,
+                        "Unable to setup Default Schema for Hud Database table.");
                 this.getPlugin().getLogger().log(Level.WARNING, e.getMessage());
             }
 
@@ -41,7 +45,8 @@ public class HudDatabaseManager extends DatabaseManager implements IHudDatabaseM
                 indexStatement.execute();
                 indexPlayerIdStatement.execute();
             } catch (SQLException e) {
-                this.getPlugin().getLogger().log(Level.WARNING, "Unable to setup Default Indexes for Hud Database table.");
+                this.getPlugin().getLogger().log(Level.WARNING,
+                        "Unable to setup Default Indexes for Hud Database table.");
                 this.getPlugin().getLogger().log(Level.WARNING, e.getMessage());
             }
         });

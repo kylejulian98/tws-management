@@ -1,0 +1,47 @@
+plugins {
+    id 'java'
+    id 'java-library'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_16
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots'
+    }
+    maven {
+        url 'https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core'
+    }
+    maven {
+        url 'https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2'
+    }
+    maven {
+        url 'https://repo.pl3x.net'
+    }
+    maven {
+        url 'https://jitpack.io'
+    }
+}
+
+dependencies {
+    testImplementation 'com.fasterxml.jackson.core:jackson-core:2.12.3'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
+    testImplementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.3'
+    testImplementation 'org.apache.commons:commons-dbcp2:2.8.0' // Connection Pooling
+    testImplementation "net.kyori:adventure-api:4.8.1"
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
+    testImplementation "org.mockito:mockito-core:3.+"
+
+    testCompileOnly 'net.pl3x.purpur:purpur-api:1.17-R0.1-SNAPSHOT'
+}
+
+test {
+    useJUnitPlatform()
+}

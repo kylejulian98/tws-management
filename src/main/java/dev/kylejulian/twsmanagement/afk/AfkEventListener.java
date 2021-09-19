@@ -27,20 +27,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 /*
  * Listener for Player Events, used to send the AFK Cancelled events of Players
  */
-public class AfkEventListener implements Listener {
-
-	private final JavaPlugin plugin;
-	private final AfkConfigModel afkConfig;
-
-	public AfkEventListener(JavaPlugin plugin, AfkConfigModel afkConfig) {
-		this.plugin = plugin;
-		this.afkConfig = afkConfig;
-	}
+public record AfkEventListener(JavaPlugin plugin,
+							   AfkConfigModel afkConfig) implements Listener {
 
 	private void raiseAfkCancelledEvent(Player player) {
 		AfkCancelledEvent event = new AfkCancelledEvent(player.getUniqueId());
 
-		this.plugin.getServer().getScheduler().runTask(this.plugin, () -> this.plugin.getServer().getPluginManager().callEvent(event));
+		this.plugin.getServer().getScheduler()
+				.runTask(this.plugin, () -> this.plugin.getServer().getPluginManager().callEvent(event));
 	}
 
 	private boolean configContainsPlayerEvent(String eventName) {

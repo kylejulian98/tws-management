@@ -20,11 +20,9 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
-public class AfkCommand implements CommandExecutor {
-
-    private final JavaPlugin plugin;
-    private final IExemptDatabaseManager afkDatabaseManager;
-    private final MojangApi mojangApi;
+public record AfkCommand(JavaPlugin plugin,
+                         IExemptDatabaseManager afkDatabaseManager,
+                         MojangApi mojangApi) implements CommandExecutor {
 
     public AfkCommand(@NotNull JavaPlugin plugin, @NotNull IExemptDatabaseManager afkDatabaseManager,
                       @NotNull MojangApi mojangApi) {
@@ -106,11 +104,22 @@ public class AfkCommand implements CommandExecutor {
                             if (!(sender instanceof Player) && finalPageIndex != maxPages) {
                                 sender.sendMessage(
                                         ChatColor.YELLOW + "To fetch the next page you need to use [" +
-                                        ChatColor.GREEN + "/afk exempt list " + (finalPageIndex + 1) +
-                                        ChatColor.YELLOW + "]");
+                                                ChatColor.GREEN + "/afk exempt list " + (finalPageIndex + 1) +
+                                                ChatColor.YELLOW + "]");
                             }
                         });
 
+                return true;
+            }
+
+            if (command.equalsIgnoreCase("clear")) {
+                CompletableFuture<Void> clearFuture = this.afkDatabaseManager.clear();
+                clearFuture.thenComposeAsync(i -> {
+                    this.plugin.getServer().getScheduler().runTask(this.plugin,
+                            () -> sender.sendMessage(ChatColor.YELLOW + "AFK Kick Exempt List cleared"));
+
+                    return new CompletableFuture<>();
+                });
                 return true;
             }
 

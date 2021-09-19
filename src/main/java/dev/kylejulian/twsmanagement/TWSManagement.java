@@ -57,19 +57,26 @@ public class TWSManagement extends JavaPlugin {
 			return;
 		}
 
-		this.databaseConnectionManager = new DatabaseConnectionManager(databaseConfig, this.getDataFolder().getAbsolutePath());
-		IExemptDatabaseManager afkDatabaseManager = new AfkDatabaseManager(this, this.databaseConnectionManager);
-		IExemptDatabaseManager whitelistExemptDatabaseManager = new WhitelistDatabaseManager(this, databaseConnectionManager);
-		IHudDatabaseManager hudDatabaseManager = new HudDatabaseManager(this, this.databaseConnectionManager);
+		this.databaseConnectionManager = new DatabaseConnectionManager(databaseConfig,
+				this.getDataFolder().getAbsolutePath());
+		IExemptDatabaseManager afkDatabaseManager = new AfkDatabaseManager(this,
+				this.databaseConnectionManager);
+		IExemptDatabaseManager whitelistExemptDatabaseManager = new WhitelistDatabaseManager(this,
+				this.databaseConnectionManager);
+		IHudDatabaseManager hudDatabaseManager = new HudDatabaseManager(this,
+				this.databaseConnectionManager);
 
 		this.getLogger().log(Level.INFO, "Internal dependencies have been created by {0}ms", stopWatch.getTime());
 
-		runDefaultSchemaSetup(new IDatabaseManager[] {afkDatabaseManager, hudDatabaseManager, whitelistExemptDatabaseManager }, stopWatch);
+		runDefaultSchemaSetup(new IDatabaseManager[] {afkDatabaseManager, hudDatabaseManager,
+				whitelistExemptDatabaseManager }, stopWatch);
 
 		this.getServer().getPluginManager().registerEvents(new PlayerListener(this, afkDatabaseManager,
 				hudDatabaseManager, this.configManager), this);
-		this.getServer().getPluginManager().registerEvents(new AfkEventListener(this, afkConfig), this);
-		this.getServer().getPluginManager().registerEvents(new PlayerEventsListener(this, nightResetConfig), this);
+		this.getServer().getPluginManager().registerEvents(new AfkEventListener(this, afkConfig),
+				this);
+		this.getServer().getPluginManager().registerEvents(new PlayerEventsListener(this, nightResetConfig),
+				this);
 		this.getServer().getPluginManager().registerEvents(new HudListener(this, hudConfig), this);
 
 		this.getLogger().log(Level.INFO, "Plugin Events have been registered by {0}ms", stopWatch.getTime());
@@ -79,12 +86,16 @@ public class TWSManagement extends JavaPlugin {
 				0, whitelistConfig.getCheck().getSeconds() * 20); //200
 
 		MojangApi mojangApi = new MojangApi(this.getLogger());
-		Objects.requireNonNull(this.getCommand("afk")).setExecutor(new AfkCommand(this, afkDatabaseManager, mojangApi));
-		Objects.requireNonNull(this.getCommand("afk")).setTabCompleter(new AfkTabCompleter(this));
-		Objects.requireNonNull(this.getCommand("hud")).setExecutor(new HudCommand(this, hudDatabaseManager));
-		Objects.requireNonNull(this.getCommand("exe")).setExecutor(new WhitelistExemptCommand(this, whitelistExemptDatabaseManager, mojangApi));
-		Objects.requireNonNull(this.getCommand("exe")).setTabCompleter(new WhitelistExemptTabCompleter(this));
-
+		Objects.requireNonNull(this.getCommand("afk"))
+				.setExecutor(new AfkCommand(this, afkDatabaseManager, mojangApi));
+		Objects.requireNonNull(this.getCommand("afk"))
+				.setTabCompleter(new AfkTabCompleter(this));
+		Objects.requireNonNull(this.getCommand("hud"))
+				.setExecutor(new HudCommand(this, hudDatabaseManager));
+		Objects.requireNonNull(this.getCommand("exe"))
+				.setExecutor(new WhitelistExemptCommand(this, whitelistExemptDatabaseManager, mojangApi));
+		Objects.requireNonNull(this.getCommand("exe"))
+				.setTabCompleter(new WhitelistExemptTabCompleter(this));
 
 		stopWatch.stop();
 		this.getLogger().log(Level.INFO, "Plugin started in {0}ms", stopWatch.getTime());
@@ -106,9 +117,11 @@ public class TWSManagement extends JavaPlugin {
 		for (IDatabaseManager databaseManager : databaseManagers) {
 			try {
 				databaseManager.setupDefaultSchema().get();
-				this.getLogger().log(Level.INFO, "{0} have been verified by {1}ms", new Object[] { databaseManager.getClass().getSimpleName(), stopWatch.getTime() });
+				this.getLogger().log(Level.INFO, "{0} have been verified by {1}ms",
+						new Object[] { databaseManager.getClass().getSimpleName(), stopWatch.getTime() });
 			} catch (InterruptedException | ExecutionException e) {
-				this.getLogger().log(Level.SEVERE, "Unable to setup Database Schemas, plugin may not work as expected. Disabling plugin.");
+				this.getLogger().log(Level.SEVERE,
+						"Unable to setup Database Schemas, plugin may not work as expected. Disabling plugin.");
 				this.getServer().getPluginManager().disablePlugin(this);
 			}
 		}

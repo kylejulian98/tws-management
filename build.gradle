@@ -43,15 +43,15 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.12.3'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.3'
-    implementation 'org.apache.commons:commons-dbcp2:2.8.0' // Connection Pooling
-    implementation "net.kyori:adventure-api:4.8.1"
-    
-    compileOnly 'com.github.NEZNAMY:TAB:2.9.0'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.12.5'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.5'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.5'
+    implementation 'org.apache.commons:commons-dbcp2:2.9.0' // Connection Pooling
+    implementation "net.kyori:adventure-api:4.9.1"
+
+    compileOnly 'com.github.NEZNAMY:TAB:2.9.2'
     compileOnly 'net.luckperms:api:5.3'
-    compileOnly 'org.jetbrains:annotations:19.0.0'
+    compileOnly 'org.jetbrains:annotations:22.0.0'
     compileOnly 'net.pl3x.purpur:purpur-api:1.17-R0.1-SNAPSHOT'
 }
 

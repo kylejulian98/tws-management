@@ -6,7 +6,6 @@ import dev.kylejulian.twsmanagement.data.entities.EntityExemptList;
 import dev.kylejulian.twsmanagement.data.interfaces.IExemptDatabaseManager;
 import dev.kylejulian.twsmanagement.extensions.ExemptListChatHelpers;
 import net.kyori.adventure.text.Component;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -19,11 +18,9 @@ import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-public class WhitelistExemptCommand implements CommandExecutor {
-
-    private final JavaPlugin plugin;
-    private final IExemptDatabaseManager whitelistExemptDatabaseManager;
-    private final MojangApi mojangApi;
+public record WhitelistExemptCommand(JavaPlugin plugin,
+                                     IExemptDatabaseManager whitelistExemptDatabaseManager,
+                                     MojangApi mojangApi) implements CommandExecutor {
 
     public WhitelistExemptCommand(@NotNull JavaPlugin plugin,
                                   @NotNull IExemptDatabaseManager whitelistExemptDatabaseManager,
@@ -88,8 +85,14 @@ public class WhitelistExemptCommand implements CommandExecutor {
                             ChatColor.GREEN + "/exe list " + (finalPageIndex + 1) + ChatColor.YELLOW + "]");
                 }
             });
+        } else if (command.equalsIgnoreCase("clear")) {
+            CompletableFuture<Void> clearFuture = this.whitelistExemptDatabaseManager.clear();
+            clearFuture.thenComposeAsync(i -> {
+                this.plugin.getServer().getScheduler().runTask(this.plugin,
+                        () -> sender.sendMessage(ChatColor.YELLOW + "Auto unwhitelist exempt list cleared"));
 
-            return true;
+                return new CompletableFuture<>();
+            });
         } else {
             if (args.length < 2) {
                 sender.sendMessage(ChatColor.RED + "You must specify a player");
@@ -137,7 +140,6 @@ public class WhitelistExemptCommand implements CommandExecutor {
                         }
                     });
         }
-
 
         return true;
     }

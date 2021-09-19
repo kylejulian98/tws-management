@@ -2,16 +2,7 @@ package dev.kylejulian.twsmanagement.commands.models;
 
 import java.util.UUID;
 
-public class ExemptFutureModel {
-
-    private final UUID playerId;
-
-    private final Boolean isExempt;
-
-    public ExemptFutureModel(final UUID playerId, final Boolean isExempt) {
-        this.playerId = playerId;
-        this.isExempt = isExempt;
-    }
+public record ExemptFutureModel(UUID playerId, Boolean isExempt) {
 
     /**
      * Get the Player Id

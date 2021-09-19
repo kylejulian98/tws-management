@@ -113,4 +113,9 @@ public class WhitelistDatabaseManager extends DatabaseManager implements IExempt
     public @NotNull CompletableFuture<Void> remove(@NotNull UUID playerId) {
         return this.execute("DELETE FROM whitelist_exempt WHERE player_uuid = ?", new Object[]{ playerId });
     }
+
+    @Override
+    public @NotNull CompletableFuture<Void> clear() {
+        return this.execute("DELETE FROM whitelist_exempt", new Object[0]);
+    }
 }

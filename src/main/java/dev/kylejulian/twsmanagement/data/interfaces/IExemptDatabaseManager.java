@@ -36,4 +36,10 @@ public interface IExemptDatabaseManager extends IDatabaseManager {
      * @return A future in which a specified Player is no longer exempt
      */
     @NotNull CompletableFuture<Void> remove(@NotNull UUID playerId);
+
+    /**
+     * Clears all Entries from the Exempt table
+     * @return A future in which all entries have been removed from the Exempt table
+     */
+    @NotNull CompletableFuture<Void> clear();
 }

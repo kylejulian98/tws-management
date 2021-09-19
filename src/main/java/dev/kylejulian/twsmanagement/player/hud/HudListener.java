@@ -46,7 +46,8 @@ public class HudListener implements Listener {
             if (!this.playerTask.containsKey(playerId)) {
                 Integer refreshRateTicks = this.hudConfig.getRefreshRateTicks();
                 if (refreshRateTicks < 1) {
-                    this.plugin.getLogger().log(Level.WARNING, "Invalid configuration for Hud Refresh Rate. Setting Refresh Rate to 10 ticks.");
+                    this.plugin.getLogger().log(Level.WARNING,
+                            "Invalid configuration for Hud Refresh Rate. Setting Refresh Rate to 10 ticks.");
                     refreshRateTicks = 10;
                 }
 

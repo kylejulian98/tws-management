@@ -12,6 +12,7 @@ commands:
       Example: /<command>
       Example: /<command> exempt add Player1
       Example: /<command> exempt remove Player1
+      Example: /<command> exempt clear
   hud:
     description: To enable or disable the HUD for showing coordinates and time
     usage: |
@@ -24,6 +25,7 @@ commands:
       Example: /<command> add Player1
       Example: /<command> remove Player1
       Example: /<command> list
+      Example: /<command> clear
     permission: tws.exempt
 permissions:
   tws.*:

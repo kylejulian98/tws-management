@@ -27,7 +27,9 @@ public class ConfigModel {
 		this.afkConfig = afkConfig;
 	}
 
-	public void setNightResetConfig(@NotNull NightResetConfigModel nightResetConfig) { this.nightResetConfig = nightResetConfig; }
+	public void setNightResetConfig(@NotNull NightResetConfigModel nightResetConfig) {
+		this.nightResetConfig = nightResetConfig;
+	}
 	
 	public void setDatabaseConfig(@NotNull DatabaseConfigModel databaseConfig) {
 		this.databaseConfig = databaseConfig;
@@ -35,5 +37,7 @@ public class ConfigModel {
 
 	public void setHudConfig(@NotNull HudConfigModel hudConfig) { this.hudConfig = hudConfig; }
 
-	public void setWhitelistConfig(@NotNull WhitelistConfigModel whitelistConfig) { this.whitelistConfig = whitelistConfig; }
+	public void setWhitelistConfig(@NotNull WhitelistConfigModel whitelistConfig) {
+		this.whitelistConfig = whitelistConfig;
+	}
 }
