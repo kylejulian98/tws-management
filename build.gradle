@@ -25,21 +25,12 @@ java {
 repositories {
     mavenCentral()
 
-  	maven {
-        url 'https://oss.sonatype.org/content/repositories/snapshots'
-    }
-  	maven {
-        url 'https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core'
-    }
-  	maven {
-        url 'https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2'
-    }
-    maven {
-        url 'https://repo.pl3x.net'
-    }
-    maven {
-        url 'https://jitpack.io'
-    }
+  	maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+  	maven { url 'https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core' }
+  	maven { url 'https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2' }
+    maven { url 'https://repo.pl3x.net' }
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://repo.kryptonmc.org/releases' }
 }
 
 dependencies {
@@ -49,7 +40,7 @@ dependencies {
     implementation 'org.apache.commons:commons-dbcp2:2.9.0' // Connection Pooling
     implementation "net.kyori:adventure-api:4.9.1"
 
-    compileOnly 'com.github.NEZNAMY:TAB:2.9.2'
+    compileOnly 'me.neznamy:tab-api:3.0.0'
     compileOnly 'net.luckperms:api:5.3'
     compileOnly 'org.jetbrains:annotations:22.0.0'
     compileOnly 'net.pl3x.purpur:purpur-api:1.17-R0.1-SNAPSHOT'
