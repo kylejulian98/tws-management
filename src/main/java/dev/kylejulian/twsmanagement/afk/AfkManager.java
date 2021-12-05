@@ -3,6 +3,9 @@ package dev.kylejulian.twsmanagement.afk;
 import dev.kylejulian.twsmanagement.afk.events.AfkEvent;
 import dev.kylejulian.twsmanagement.configuration.AfkConfigModel;
 import dev.kylejulian.twsmanagement.data.interfaces.IExemptDatabaseManager;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -61,12 +64,12 @@ public class AfkManager implements Runnable {
 		}
 
 		CompletableFuture<Boolean> isPlayerAfkKickExemptFuture = this.afkDatabase.isExempt(playerId);
-		CompletableFuture<Void> kickPlayerFuture = isPlayerAfkKickExemptFuture.thenAcceptAsync(result -> {
+		isPlayerAfkKickExemptFuture.thenAcceptAsync(result -> {
 			if (!result) { // Player is not Kick exempt
 				if (canKickPlayer(afkKickTime, afkTime)) {
 					// Player must be kicked synchronously
 					plugin.getServer().getScheduler()
-							.runTask(this.plugin, () -> player.kickPlayer(afkConfig.getKickMessage()));
+							.runTask(this.plugin, () -> player.kick(getKickMessageComponent(afkConfig)));
 				}
 			}
 		});
@@ -90,5 +93,10 @@ public class AfkManager implements Runnable {
 	
 	private void addPlayerAfkMinutes() {
 		this.afkMinutes = this.afkMinutes + 1;
+	}
+
+	private TextComponent getKickMessageComponent(AfkConfigModel afkConfig) {
+		String message = afkConfig.getKickMessage();
+		return Component.text(message);
 	}
 }

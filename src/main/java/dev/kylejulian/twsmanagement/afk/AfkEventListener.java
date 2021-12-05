@@ -2,10 +2,11 @@ package dev.kylejulian.twsmanagement.afk;
 
 import dev.kylejulian.twsmanagement.afk.events.AfkCancelledEvent;
 import dev.kylejulian.twsmanagement.configuration.AfkConfigModel;
+import io.papermc.paper.event.player.AsyncChatEvent;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
@@ -50,7 +51,7 @@ public record AfkEventListener(JavaPlugin plugin,
 	}
 
 	@EventHandler
-	public void onPlayerChat(AsyncPlayerChatEvent e) {
+	public void onPlayerChat(AsyncChatEvent e) {
 		if (this.configContainsPlayerEvent("onPlayerChat")) {
 			this.raiseAfkCancelledEvent(e.getPlayer());
 		}
