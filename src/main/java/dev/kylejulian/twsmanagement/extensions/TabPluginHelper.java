@@ -2,23 +2,37 @@ package dev.kylejulian.twsmanagement.extensions;
 
 import java.util.UUID;
 
-import me.neznamy.tab.api.EnumProperty;
+import me.neznamy.tab.api.TabAPI;
 import me.neznamy.tab.api.TabPlayer;
-import me.neznamy.tab.api.TABAPI;
+import me.neznamy.tab.api.TablistFormatManager;
+
 import org.jetbrains.annotations.NotNull;
 
 public class TabPluginHelper {
 
 	public static void setTabSuffix(@NotNull UUID playerId, @NotNull String message) {
-		EnumProperty type = EnumProperty.TABSUFFIX;
-		TabPlayer player = TABAPI.getPlayer(playerId);
-		player.setValueTemporarily(type, message);
+		TabAPI api = TabAPI.getInstance();
+		TabPlayer player = api.getPlayer(playerId);
+
+		if (player == null) {
+			// TODO: Log warning
+			return;
+		}
+
+		TablistFormatManager tablistFormatManager = api.getTablistFormatManager();
+		tablistFormatManager.setSuffix(player, message);
 	}
 
 	public static boolean hasTabSuffix(@NotNull UUID playerId) {
-		EnumProperty type = EnumProperty.TABSUFFIX;
-		TabPlayer player = TABAPI.getPlayer(playerId);
-		String suffix = player.getTemporaryValue(type);
+		TabAPI api = TabAPI.getInstance();
+		TabPlayer player = api.getPlayer(playerId);
+
+		if (player == null) {
+			return false;
+		}
+
+		TablistFormatManager tablistFormatManager = api.getTablistFormatManager();
+		String suffix = tablistFormatManager.getCustomSuffix(player);
 
 		return suffix != null && suffix.contains("AFK");
 	}

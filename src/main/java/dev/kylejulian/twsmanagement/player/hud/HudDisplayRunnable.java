@@ -1,7 +1,6 @@
 package dev.kylejulian.twsmanagement.player.hud;
 
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -36,21 +35,22 @@ public class HudDisplayRunnable extends BukkitRunnable {
         final float playerYaw = location.getYaw();
 
         String xDisplay = "\u00a7a\u00a7lX \u00a7r%s ";
-        final String xFormatted = String.format(xDisplay, x);
+        final Component xFormatted = Component.text(String.format(xDisplay, x));
         String yDisplay = "\u00a7a\u00a7lY \u00a7r%s ";
-        final String yFormatted = String.format(yDisplay, y);
+        final Component yFormatted = Component.text(String.format(yDisplay, y));
         String zDisplay = "\u00a7a\u00a7lZ \u00a7r%s ";
-        final String zFormatted = String.format(zDisplay, z);
+        final Component zFormatted = Component.text(String.format(zDisplay, z));
         String orientationDisplay = "\u00a7e\u00a7l%s ";
-        final String orientationFormatted = String.format(orientationDisplay, Orientation.getOrientation(playerYaw));
+        final Component orientationFormatted = Component.text(String.format(orientationDisplay, Orientation.getOrientation(playerYaw)));
         String timeDisplay = "\u00a7c\u00a7l%s";
-        final String timeFormatted = String.format(timeDisplay, Time.ticksToTime(playerWorldTime));
+        final Component timeFormatted = Component.text(String.format(timeDisplay, Time.ticksToTime(playerWorldTime)));
 
-        BaseComponent baseComponent = new TextComponent(xFormatted);
-        baseComponent.addExtra(new TextComponent(yFormatted));
-        baseComponent.addExtra(new TextComponent(zFormatted));
-        baseComponent.addExtra(new TextComponent(orientationFormatted));
-        baseComponent.addExtra(new TextComponent(timeFormatted));
+        Component baseComponent = Component.empty()
+            .append(xFormatted)
+            .append(yFormatted)
+            .append(zFormatted)
+            .append(orientationFormatted)
+            .append(timeFormatted);
 
         player.sendActionBar(baseComponent);
     }
