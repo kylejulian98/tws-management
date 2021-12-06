@@ -77,23 +77,3 @@ task release {
         file(dirStr + rootProject.name + '-' + version + '-SNAPSHOT.jar').renameTo(dirStr + rootProject.name + '-' + version + '.jar')
     }
 }
-
-publishing {
-    repositories {
-        maven {
-            name = 'GitHubPackages'
-            url = uri('https://maven.pkg.github.com/kylejulian98/tws.management')
-            credentials {
-                username = project.findProperty('gpr.user') ?: System.getenv('USERNAME')
-                password = project.findProperty('gpr.key') ?: System.getenv('TOKEN')
-            }
-        }
-    }
-
-    publications {
-        shadow(MavenPublication) { publication ->
-            version = version
-            project.shadow.component(publication)
-        }
-    }
-}
