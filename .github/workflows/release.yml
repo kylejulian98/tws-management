@@ -27,6 +27,7 @@ jobs:
     - name: Find Release Asset Details
       id: export_asset_vars
       run: |
+        echo "Version is ${GITHUB_REF_NAME}"
         asset=$(find ${{ github.workspace }}/build/libs -name TWSManagement\*)
         echo "::set-output name=ASSET_NAME::$asset"
 
