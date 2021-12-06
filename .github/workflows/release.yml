@@ -2,10 +2,8 @@ name: Release on tag
 
 on:
   push:
-    branches:
-      - main
     tags:
-      - 'v*' # For v1.0, v0.1.0, etc
+      - 'v*.*.*' # For v1.0, v0.1.0, etc
 
 jobs:
   build:
@@ -26,22 +24,15 @@ jobs:
         gradle-version: 7.3.1
         arguments: build -Pver=${GITHUB_REF/refs\/tags\//} release
 
-    - name: Draft Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: true
+    - name: Find Release Asset Details
+      id: export_asset_vars
+      run: |
+        asset=$(find ${{ github.workspace }}/build/libs -name TWSManagement\*)
+        echo "::set-output name=ASSET_NAME::$asset"
 
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Release
+      users: softprops/action-gh-release@v1
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{ github.workspace }}/build/libs
-        asset_name: TWSManagement-${GITHUB_REF/refs\/tags\//}
-        asset_content_type: application/java-archive
+        draft: true
+        files: |
+          ${{ steps.export_asset_vars.outputs.ASSET_NAME }}
