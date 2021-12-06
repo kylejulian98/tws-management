@@ -31,7 +31,7 @@ jobs:
         echo "::set-output name=ASSET_NAME::$asset"
 
     - name: Release
-      users: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v1
       with:
         draft: true
         files: |
