@@ -18,6 +18,7 @@ This plugin has a variety of bespoke features intended for the use of TWS Server
   - `/afk exempt list`
   - `/afk exempt add <PlayerName>`
   - `/afk exempt remove <PlayerName>`
+  - `/afk exempt clear`
 - Automatically set night to day if the following conditions are met:
   - It is currently night time (in game)
   - All remaining players are AFK
@@ -34,12 +35,13 @@ This plugin has a variety of bespoke features intended for the use of TWS Server
   - `/exe list`
   - `/exe add <PlayerName>`
   - `/exe remove <PlayerName>`
+  - `/exe clear`
 
 This plugin maintains a local SQLite database which persists information used by some of the provided features. This is found under: `/plugins/tws.management/tws-local.db`.
 
 ### Running the Plugin
 
-This plugin runs on Minecraft Purpur 1.17. You can download the latest version of the plugin jar through navigating the Packages section of this github repository, or using the following link [packages](https://github.com/kylejulian98/tws.management/packages).
+This plugin runs on Minecraft Purpur 1.17.1. You can download the latest version of the plugin jar through navigating the Packages section of this github repository, or using the following link [packages](https://github.com/kylejulian98/tws.management/packages).
 
 #### Requirements
 
@@ -50,5 +52,5 @@ The following symbols are used to indicate if a dependency (plugin also running 
 
 To run this plugin you must have the following dependencies also running on your Minecraft Server:
 
-- ❓ [TAB](https://www.spigotmc.org/resources/tab-1-5-x-1-16-1-rgb-support.57806/) - Displays the AFK suffix tag next to your name, in the tab leaderboard.
+- ❗ [TAB](https://www.mc-market.org/resources/20631/) - Displays the AFK suffix tag next to your name, in the tab leaderboard.
 - ❓ [LuckPerms](https://www.spigotmc.org/resources/luckperms.28140/) - Used when checking if players have a permission node when automatically unwhitelisting.
