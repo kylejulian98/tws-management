@@ -36,20 +36,12 @@ jobs:
         release_name: Release ${{ github.ref }}
         draft: true
 
-    - name: Find Asset Details
-      id: export_asset_vars
-      run: |
-        assetPath=$(find ${{ github.workspace }}/build/libs -name TWSManagement\*)
-        assetName=$(basename -a $assetPath)
-        echo "::set-output name=ASSET_PATH::$assetPath"
-        echo "::set-output name=ASSET_NAME::$assetName"
-
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{ steps.export_asset_vars.outputs.ASSET_PATH }}
-        asset_name: ${{ steps.export_asset_vars.outputs.ASSET_NAME }}
+        asset_path: ${{ github.workspace }}/build/libs
+        asset_name: TWSManagement-${GITHUB_REF/refs\/tags\//}
         asset_content_type: application/java-archive
