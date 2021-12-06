@@ -28,7 +28,13 @@ repositories {
   	maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
   	maven { url 'https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core' }
   	maven { url 'https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2' }
-    maven { url 'https://repo.pl3x.net' }
+
+    // Purpur main branch
+    // maven { url 'https://repo.pl3x.net' }
+
+    // Purpur snapshot branch
+    maven { url 'https://repo.purpurmc.org/snapshots' }
+
     maven { url 'https://jitpack.io' }
     maven { url 'https://repo.kryptonmc.org/releases' }
 }
@@ -43,7 +49,12 @@ dependencies {
     compileOnly 'me.neznamy:tab-api:3.0.0'
     compileOnly 'net.luckperms:api:5.3'
     compileOnly 'org.jetbrains:annotations:23.0.0'
-    compileOnly 'net.pl3x.purpur:purpur-api:1.17.1-R0.1-SNAPSHOT'
+
+    // Purpur main branch
+    // compileOnly 'net.pl3x.purpur:purpur-api:1.17.1-R0.1-SNAPSHOT'
+
+    // Purpur snapshot branch
+    compileOnly 'org.purpurmc.purpur:purpur-api:1.18-R0.1-SNAPSHOT'
 }
 
 processResources {
