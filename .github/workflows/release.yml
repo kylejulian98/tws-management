@@ -22,7 +22,7 @@ jobs:
       uses: gradle/gradle-build-action@v2
       with:
         gradle-version: 7.3.1
-        arguments: build -Pver=${{ env.GITHUB_REF_NAME }} release
+        arguments: build release
 
     - name: Find Release Asset Details
       id: export_asset_vars

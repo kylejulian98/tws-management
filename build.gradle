@@ -9,14 +9,6 @@ plugins {
 
 group = "dev.kylejulian.twsmanagement"
 
-if (hasProperty('ver')) {
-    version = ver.substring(1)
-} else {
-    SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd-HHmm")
-    sdf.setTimeZone(TimeZone.getTimeZone("UTC"))
-    version = sdf.format(new Date()).toString()
-}
-
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
@@ -74,6 +66,9 @@ task release {
     dependsOn build
     doLast {
         def dirStr = buildDir.toString() + '/libs/'
-        file(dirStr + rootProject.name + '-' + version + '-SNAPSHOT.jar').renameTo(dirStr + rootProject.name + '-' + version + '.jar')
+        def pipelineVersion = System.getenv('GITHUB_REF_NAME')
+        version = pipelineVersion
+        version = version.split('v')[1]
+        file(dirStr + rootProject.name + '-SNAPSHOT.jar').renameTo(dirStr + rootProject.name + '-' + version + '.jar')
     }
 }
