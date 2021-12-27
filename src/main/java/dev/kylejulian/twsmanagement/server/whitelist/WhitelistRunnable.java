@@ -9,11 +9,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -81,8 +83,7 @@ public record WhitelistRunnable(JavaPlugin plugin,
         CompletableFuture.allOf(completableFutures);
     }
 
-    private @Nullable
-    LuckPermsHelper getLuckPermsHelper() {
+    private @Nullable LuckPermsHelper getLuckPermsHelper() {
         LuckPermsHelper luckPermsHelper = null;
         try {
             // Fully qualified names as to avoid issues creating the class when LP isn't deployed with this plugin
@@ -99,9 +100,7 @@ public record WhitelistRunnable(JavaPlugin plugin,
         return luckPermsHelper;
     }
 
-    private @NotNull
-    CompletableFuture<Void> getPlayerNeedsToUnwhitelistedFuture(
-            @NotNull CompletableFuture<PlayerWhitelisted> future) {
+    private @NotNull CompletableFuture<Void> getPlayerNeedsToUnwhitelistedFuture(@NotNull CompletableFuture<PlayerWhitelisted> future) {
         return future.thenAcceptAsync(player -> {
             if (!player.getWhitelist()) { // Player needs to be unwhitelisted
                 Runnable unwhitelistPlayerTask = () -> {
@@ -114,35 +113,51 @@ public record WhitelistRunnable(JavaPlugin plugin,
         });
     }
 
-    private @NotNull
-    CompletableFuture<PlayerWhitelisted>
-    getVerifyWhitelistedPlayerFuture(@NotNull LocalDateTime unwhitelistDate,
-                                     @NotNull OfflinePlayer whitelistedPlayer,
-                                     @NotNull CompletableFuture<Boolean> future) {
+    private @NotNull CompletableFuture<PlayerWhitelisted> getVerifyWhitelistedPlayerFuture(
+        @NotNull LocalDateTime unwhitelistDate,
+        @NotNull OfflinePlayer whitelistedPlayer,
+        @NotNull CompletableFuture<Boolean> future) {
 
         return future.thenApplyAsync(result -> {
-            PlayerWhitelisted playerWhitelisted =
-                    new PlayerWhitelisted(whitelistedPlayer.getUniqueId(), true);
+            PlayerWhitelisted playerWhitelisted = new PlayerWhitelisted(whitelistedPlayer.getUniqueId(), true);
 
             if (result) { // Player has Permission
                 return playerWhitelisted;
             } else {
                 long lastPlayTime = whitelistedPlayer.getLastLogin();
 
-                // If Player is exempt in database
-
                 if (lastPlayTime == 0L) { // Player has not joined
                     return playerWhitelisted;
                 }
 
-                LocalDateTime lastPlayDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(lastPlayTime),
-                        ZoneId.systemDefault());
-                long days = lastPlayDate.until(LocalDateTime.now(), ChronoUnit.DAYS);
+                LocalDateTime now = LocalDateTime.now();
+                LocalDateTime lastPlayDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(lastPlayTime), ZoneId.systemDefault());
+                Duration inactivityPeriod = Duration.between(lastPlayDate, now);
+                
                 if (lastPlayDate.isBefore(unwhitelistDate)) {
-                    this.plugin.getLogger().log(Level.INFO,
-                            "Player ({0}) has been unwhitelisted due to inactivity! " +
-                                    "Has been inactive for : {1} days!",
-                            new Object[]{whitelistedPlayer.getName(), days});
+
+                    if (whitelistConfigModel.getWriteLogFile()) {
+                        File logFile = new File(this.plugin.getDataFolder(), "unwhitelists.log");
+                        try {
+                            logFile.createNewFile();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+    
+                        try {
+                            FileWriter printWriter = new FileWriter(logFile, true);
+                            // Time of Unwhitelist, Name, Days Inactive, Last Online Date
+                            printWriter.append(now + " | " + whitelistedPlayer.getName() + " | inactive for: " + 
+                                inactivityPeriod.toDays() + " days | Last online at " + lastPlayDate);
+                            printWriter.append(System.lineSeparator());
+                            printWriter.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    this.plugin.getLogger().log(Level.INFO, "Player ({0}) has been unwhitelisted due to inactivity! Has been inactive for : {1} days!",
+                            new Object[]{whitelistedPlayer.getName(), inactivityPeriod.toDays()});
 
                     playerWhitelisted.setWhitelist(false);
                     return playerWhitelisted;
@@ -150,7 +165,7 @@ public record WhitelistRunnable(JavaPlugin plugin,
 
                 this.plugin.getLogger().log(Level.FINE,
                         "Player ({0}) will not be unwhitelisted! Has been inactive for : {1} days!",
-                        new Object[]{whitelistedPlayer.getName(), days});
+                        new Object[]{whitelistedPlayer.getName(), inactivityPeriod.toDays()});
             }
 
             return playerWhitelisted;

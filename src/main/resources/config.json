@@ -5,7 +5,9 @@
 		"kickMessage": "You have been kicked for being AFK for too long!",
 		"playerCountNeededForKick": 25,
 		"events": ["onPlayerChat", "onPlayerInteractEntity", "onPlayerInteract", "onPlayerBedEnter", "onPlayerChangedWorld", "onPlayerEditBook", "onPlayerDropItem", "onPlayerItemBreak", "onPlayerShearEntity", "onPlayerToggleFlight", "onPlayerToggleSprint", "onPlayerToggleSneak", "onPlayerUnleashEntity", "onPlayerBucketFill", "onPlayerBucketEmpty", "onPlayerMove", "onPlayerExpChange"
-		]
+		],
+		"sendPlayerAfkMessage": true,
+		"afkKick": true
 	},
 	"nightResetConfig": {
 		"enabled": true
@@ -17,7 +19,8 @@
 	"whitelistConfig": {
 		"enabled": true,
 		"inactivity": "P14DT0S",
-		"check": "PT30M"
+		"check": "PT30M",
+		"writeLogFile": true
 	},
 	"databaseConfig": {
 		"name": "tws-local.db",

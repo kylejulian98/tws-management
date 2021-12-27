@@ -11,7 +11,7 @@ public class PlayerWhitelisted {
 
     public PlayerWhitelisted(@NotNull UUID playerId, Boolean whitelist) {
         this.playerId = playerId;
-        this.whitelist = whitelist;
+        this.setWhitelist(whitelist);;
     }
 
     public UUID getPlayerId() {

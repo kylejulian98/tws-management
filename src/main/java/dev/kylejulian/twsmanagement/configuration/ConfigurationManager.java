@@ -90,6 +90,8 @@ public class ConfigurationManager {
             afkConfigModel.setKickTimeMinutes(5);
             afkConfigModel.setPlayerCountNeededForKick(25);
             afkConfigModel.setTimeMinutes(5);
+            afkConfigModel.setSendPlayerAfkMessage(true);
+            afkConfigModel.setAfkKick(true);
 
             configModel.setAfkConfig(afkConfigModel);
             saveRequired = true;
@@ -120,6 +122,7 @@ public class ConfigurationManager {
             whitelistConfigModel.setEnabled(true);
             whitelistConfigModel.setInactivity(Duration.ofDays(14));
             whitelistConfigModel.setCheck(Duration.ofMinutes(30));
+            whitelistConfigModel.setWriteLogFile(true);
 
             configModel.setWhitelistConfig(whitelistConfigModel);
             saveRequired = true;
