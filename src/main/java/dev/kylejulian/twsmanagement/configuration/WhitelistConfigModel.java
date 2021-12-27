@@ -6,7 +6,7 @@ import java.time.Duration;
 
 public class WhitelistConfigModel {
 
-    private boolean enabled;
+    private boolean enabled, writeLogFile;
     private Duration inactivity, check;
 
     public void setEnabled(boolean enabled) { this.enabled = enabled; }
@@ -19,6 +19,8 @@ public class WhitelistConfigModel {
      */
     public void setCheck(@NotNull Duration duration) { this.check = duration; }
 
+    public void setWriteLogFile(boolean writeLogFile) { this.writeLogFile = writeLogFile; }
+
     public boolean getEnabled() { return this.enabled; }
 
     public @NotNull Duration getInactivity() { return this.inactivity; }
@@ -28,4 +30,6 @@ public class WhitelistConfigModel {
      * @return Duration between checks
      */
     public @NotNull Duration getCheck() { return this.check; }
+
+    public boolean getWriteLogFile() { return this.writeLogFile; }
 }

@@ -17,7 +17,8 @@
 	"whitelistConfig": {
 		"enabled": true,
 		"inactivity": "P14DT0S",
-		"check": "PT30M"
+		"check": "PT30M",
+		"writeLogFile": true
 	},
 	"databaseConfig": {
 		"name": "tws-local.db",

@@ -120,6 +120,7 @@ public class ConfigurationManager {
             whitelistConfigModel.setEnabled(true);
             whitelistConfigModel.setInactivity(Duration.ofDays(14));
             whitelistConfigModel.setCheck(Duration.ofMinutes(30));
+            whitelistConfigModel.setWriteLogFile(true);
 
             configModel.setWhitelistConfig(whitelistConfigModel);
             saveRequired = true;
