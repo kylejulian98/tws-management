@@ -1,9 +1,15 @@
 main: ${PACKAGE}.${NAME}
 name: ${NAME}
-version: "${VERSION}"
-api-version: "1.17"
+version: "${PLUGINVERSION}"
+author: JuHDude
+prefix: TWSManagement
+description: Bespoke plugin used to provide management functionalities for the tws.gg Minecraft Server
+api-version: "1.18"
 database: true
-softdepend: [TAB, LuckPerms]
+depend:
+- TAB
+softdepend:
+- LuckPerms
 commands:
   afk:
     description: To go afk. Specify the exempt keyword and a Player name to prevent them from being kicked for inactivity.
