@@ -62,37 +62,29 @@ public class ExemptListChatHelpers {
             playerIndex++;
         }
 
-        header = header
-                .append(Component.newline())
-                .append(Component.text("<--", red));
+        Component prevPageComponent = Component.text("<--", red);
+        Component nextPageComponent = Component.text("-->", red);
 
         if (prevPage > 0) { // Only allow user to go back if they can
-            header = header
-                    .append(Component.text()
-                            .clickEvent(ClickEvent.clickEvent(Action.RUN_COMMAND,
-                                    commandToNextPage + " " + prevPage))
-                            .hoverEvent(Component.text("Click to go to the previous Page", yellow)
-                                    .asHoverEvent())
-                            .asComponent()
-                    );
+            prevPageComponent = prevPageComponent
+                .clickEvent(ClickEvent.clickEvent(Action.RUN_COMMAND, commandToNextPage + " " + prevPage))
+                .hoverEvent(Component.text("Click to go to the previous page", yellow).asHoverEvent());
+        }
+
+        if (nextPage <= maxPages) {// Only allow user to go forward if they can
+            nextPageComponent = nextPageComponent
+                .clickEvent(ClickEvent.clickEvent(Action.RUN_COMMAND, commandToNextPage + " " + nextPage))
+                .hoverEvent(Component.text("Click to go to the next page", yellow).asHoverEvent());
         }
 
         header = header
+                .append(Component.newline())
+                .append(prevPageComponent)
                 .append(Component.text(" Page (", yellow))
                 .append(Component.text(pageIndex + "/" + maxPages, green))
                 .append(Component.text(") ", yellow))
-                .append(Component.text("-->", red));
-
-        if (nextPage <= maxPages) {// Only allow user to go forward if they can
-            header = header
-                    .append(Component.text()
-                            .clickEvent(ClickEvent.clickEvent(Action.RUN_COMMAND,
-                                    commandToNextPage + " " + nextPage))
-                            .hoverEvent(Component.text("Click to go to the next Page", yellow).asHoverEvent())
-                            .asComponent()
-                    );
-        }
-
+                .append(nextPageComponent);
+        
         return header;
     }
 

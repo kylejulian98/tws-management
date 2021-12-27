@@ -1,5 +1,3 @@
-import java.text.SimpleDateFormat
-
 plugins {
     id 'java'
     id 'java-library'
@@ -8,6 +6,16 @@ plugins {
 }
 
 group = "dev.kylejulian.twsmanagement"
+def dirStr = buildDir.toString() + '/libs/'
+def pipelineVersion = System.getenv('GITHUB_REF_NAME')
+version = pipelineVersion
+
+if (version.split('v').length < 2) {
+    version = '1.0.0-beta'
+}
+else {
+    version = version.split('v')[1]
+}
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -38,7 +46,7 @@ dependencies {
     implementation 'org.apache.commons:commons-dbcp2:2.9.0' // Connection Pooling
     implementation "net.kyori:adventure-api:4.9.3"
 
-    compileOnly 'me.neznamy:tab-api:3.0.0'
+    compileOnly 'me.neznamy:tab-api:3.0.1'
     compileOnly 'net.luckperms:api:5.3'
     compileOnly 'org.jetbrains:annotations:23.0.0'
 
@@ -49,9 +57,10 @@ dependencies {
     compileOnly 'org.purpurmc.purpur:purpur-api:1.18-R0.1-SNAPSHOT'
 }
 
+// Patch plugin.yml file
 processResources {
     filesMatching("**/plugin.yml") {
-        expand ( VERSION: version, PACKAGE: project.group.toString(), NAME: rootProject.name )
+        expand ( PLUGINVERSION: version, PACKAGE: project.group.toString(), NAME: rootProject.name )
     }
 }
 
@@ -65,10 +74,6 @@ assemble.dependsOn(shadowJar)
 task release {
     dependsOn build
     doLast {
-        def dirStr = buildDir.toString() + '/libs/'
-        def pipelineVersion = System.getenv('GITHUB_REF_NAME')
-        version = pipelineVersion
-        version = version.split('v')[1]
-        file(dirStr + rootProject.name + '-SNAPSHOT.jar').renameTo(dirStr + rootProject.name + '-' + version + '.jar')
+        file(dirStr + rootProject.name + "-" + version + '-SNAPSHOT.jar').renameTo(dirStr + rootProject.name + '-' + version + '.jar')
     }
 }
