@@ -7,11 +7,13 @@ public class AfkConfigModel {
 	private String kickMessage;
 	private int playerCountNeededForKick;
 	private String[] events;
+	private boolean sendPlayerAfkMessage;
+	private boolean afkKick;
 	
 	public int getTimeMinutes() {
 		return this.timeMinutes;
 	}
-	
+
 	public int getKickTimeMinutes() {
 		return this.kickTimeMinutes;
 	}
@@ -26,6 +28,14 @@ public class AfkConfigModel {
 	
 	public String[] getEvents() {
 		return this.events;
+	}
+
+	public boolean getSendPlayerAfkMessage() {
+		return this.sendPlayerAfkMessage;
+	}
+
+	public boolean getAfkKick() {
+		return this.afkKick;
 	}
 	
 	public void setTimeMinutes(int timeMinutes) {
@@ -46,5 +56,13 @@ public class AfkConfigModel {
 	
 	public void setEvents(String[] events) {
 		this.events = events;
+	}
+
+	public void setSendPlayerAfkMessage(boolean sendPlayerAfkMessage) {
+		this.sendPlayerAfkMessage = sendPlayerAfkMessage;
+	}
+
+	public void setAfkKick(boolean afkKick) {
+		this.afkKick = afkKick;
 	}
 }

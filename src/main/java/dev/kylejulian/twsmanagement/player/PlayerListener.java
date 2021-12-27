@@ -122,11 +122,15 @@ public class PlayerListener implements Listener {
 		if (!TabPluginHelper.hasTabSuffix(playerId)) {
 			Player player = this.plugin.getServer().getPlayer(playerId);
 			if (player != null) {
-				player.sendMessage(ChatColor.DARK_RED + "You are now AFK");
-				Runnable tabTask = () -> TabPluginHelper.setTabSuffix(playerId,
-						ChatColor.GRAY + "[" + ChatColor.RED + "AFK" + ChatColor.GRAY + "] " +
-								ChatColor.RESET);
-				this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, tabTask);
+				AfkConfigModel afkConfig = configManager.getConfig().getAfkConfig();
+				if (afkConfig.getSendPlayerAfkMessage()) {
+					player.sendMessage(ChatColor.DARK_RED + "You are now AFK");
+				}
+
+				Runnable tabTask = () -> TabPluginHelper.setTabSuffix(playerId, 
+					ChatColor.GRAY + "[" + ChatColor.RED + "AFK" + ChatColor.GRAY + "] " + ChatColor.RESET);
+				
+					this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, tabTask);
 			}
 		}
 	}

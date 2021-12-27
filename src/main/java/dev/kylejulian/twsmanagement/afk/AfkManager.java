@@ -78,10 +78,13 @@ public class AfkManager implements Runnable {
 	private boolean canKickPlayer(int afkKickTime, int afkTime) {
 		// Player has to be inactive for both the AFK time and AFK Kick time
 		if (this.getPlayerAfkMinutes() >= (afkKickTime + afkTime)) {
-			int numberOfPlayersOnline = this.plugin.getServer().getOnlinePlayers().size(); 
-			int numberOfRequiredPlayersToKick = this.afkConfig.getPlayerCountNeededForKick();
-
-			return numberOfPlayersOnline >= numberOfRequiredPlayersToKick;
+			// Only kick if it is enabled in the configuration
+			if (this.afkConfig.getAfkKick()) {
+				int numberOfPlayersOnline = this.plugin.getServer().getOnlinePlayers().size(); 
+				int numberOfRequiredPlayersToKick = this.afkConfig.getPlayerCountNeededForKick();
+	
+				return numberOfPlayersOnline >= numberOfRequiredPlayersToKick;
+			}
 		}
 		
 		return false;
