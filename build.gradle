@@ -9,7 +9,13 @@ group = "dev.kylejulian.twsmanagement"
 def dirStr = buildDir.toString() + '/libs/'
 def pipelineVersion = System.getenv('GITHUB_REF_NAME')
 version = pipelineVersion
-version = version.split('v')[1]
+
+if (version.split('v').length < 2) {
+    version = '1.0.0-beta'
+}
+else {
+    version = version.split('v')[1]
+}
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
