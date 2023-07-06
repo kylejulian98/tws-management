@@ -7,7 +7,9 @@ import dev.kylejulian.twsmanagement.data.entities.EntityExemptList;
 import dev.kylejulian.twsmanagement.data.interfaces.IExemptDatabaseManager;
 import dev.kylejulian.twsmanagement.extensions.ExemptListChatHelpers;
 import net.kyori.adventure.text.Component;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -41,20 +43,29 @@ public record AfkCommand(JavaPlugin plugin,
 
                 this.plugin.getServer().getScheduler().runTask(this.plugin, afkEventTask);
             } else {
-                this.plugin.getServer().getLogger().log(Level.WARNING,
-                        "You must be a Player to use this command!");
+                this.plugin.getServer().getLogger().log(Level.WARNING, "You must be a Player to use this command!");
             }
         } else if (args.length > 1) {
             String base = args[0];
             String command = args[1];
 
             if (!base.equalsIgnoreCase("exempt")) {
-                sender.sendMessage(ChatColor.RED + "Command is not recognised");
+                TextComponent commandIsNotRecognised = Component.text()
+                    .color(NamedTextColor.RED)
+                    .append(Component.text("Command is not recognised"))
+                    .build();
+
+                sender.sendMessage(commandIsNotRecognised);
                 return false;
             }
 
             if (!sender.hasPermission("tws.afk.exempt") && !sender.isOp()) {
-                sender.sendMessage(ChatColor.RED + "You do not have permissions to use this command.");
+                TextComponent noPermissions = Component.text()
+                    .color(NamedTextColor.RED)
+                    .append(Component.text("You do not have permissions to use this command."))
+                    .build();
+
+                sender.sendMessage(noPermissions);
                 return true;
             }
 
@@ -67,7 +78,7 @@ public record AfkCommand(JavaPlugin plugin,
             }
 
             if (args.length < 3) {
-                sender.sendMessage(ChatColor.RED + "You need to specify the correct number of arguments.");
+                sender.sendMessage(NamedTextColor.RED + "You need to specify the correct number of arguments.");
                 return false;
             }
 
@@ -87,27 +98,49 @@ public record AfkCommand(JavaPlugin plugin,
                     if (whitelistExemptFutureModel.getIsExempt()) {
                         // Exempt
                         if (command.equalsIgnoreCase("add")) {
-                            this.plugin.getServer().getScheduler().runTask(this.plugin,
-                                    () -> sender.sendMessage(ChatColor.RED + target +
-                                            " is already AFK Kick exempt"));
+                            TextComponent targetAlreadyExempt = Component.text()
+                                .color(NamedTextColor.RED)
+                                .append(Component.text(target))
+                                .appendSpace()
+                                .append(Component.text("is already AFK Kick exempt"))
+                                .build();
+
+                            this.plugin.getServer().getScheduler().runTask(this.plugin, () -> sender.sendMessage(targetAlreadyExempt));
                             return new CompletableFuture<>();
                         }
 
-                        this.plugin.getServer().getScheduler().runTask(this.plugin,
-                                () -> sender.sendMessage(ChatColor.GREEN + target +
-                                        " was removed from the AFK Kick exempt list"));
+                        TextComponent targetRemoved = Component.text()
+                            .color(NamedTextColor.GREEN)
+                            .append(Component.text(target))
+                            .appendSpace()
+                            .append(Component.text("was removed from the AFK Kick exempt list"))
+                            .build();
+
+                        this.plugin.getServer().getScheduler().runTask(this.plugin, () -> sender.sendMessage(targetRemoved));
+
                         return afkDatabaseManager.remove(whitelistExemptFutureModel.getPlayerId());
                     } else {
                         // Not exempt
                         if (command.equalsIgnoreCase("add")) {
-                            this.plugin.getServer().getScheduler().runTask(this.plugin,
-                                    () -> sender.sendMessage(ChatColor.GREEN + target +
-                                            " was added to AFK Kick exempt list"));
+                            TextComponent targetAdded = Component.text()
+                                .color(NamedTextColor.GREEN)
+                                .append(Component.text(target))
+                                .appendSpace()
+                                .append(Component.text("was added to AFK Kick exempt list"))
+                                .build();
+
+                            this.plugin.getServer().getScheduler().runTask(this.plugin, () -> sender.sendMessage(targetAdded));
                             return afkDatabaseManager.add(whitelistExemptFutureModel.getPlayerId());
                         }
+                        
+                        TextComponent targetIsNotAfkList = Component.text()
+                            .color(NamedTextColor.RED)
+                            .append(Component.text(target))
+                            .appendSpace()
+                            .append(Component.text("is not AFK Kick exempt"))
+                            .build();
 
-                        this.plugin.getServer().getScheduler().runTask(this.plugin,
-                                () -> sender.sendMessage(ChatColor.RED + target + " is not AFK Kick exempt"));
+                        this.plugin.getServer().getScheduler().runTask(this.plugin, () -> sender.sendMessage(targetIsNotAfkList));
                         return new CompletableFuture<>();
                     }
                 });
@@ -116,8 +149,12 @@ public record AfkCommand(JavaPlugin plugin,
     private boolean executeClearSubcommand(@NotNull CommandSender sender) {
         CompletableFuture<Void> clearFuture = this.afkDatabaseManager.clear();
         clearFuture.thenComposeAsync(i -> {
-            this.plugin.getServer().getScheduler().runTask(this.plugin,
-                    () -> sender.sendMessage(ChatColor.YELLOW + "AFK Kick Exempt List cleared"));
+            TextComponent afkListCleared = Component.text()
+                .color(NamedTextColor.YELLOW)
+                .append(Component.text("AFK Kick Exempt List cleared"))
+                .build();
+
+            this.plugin.getServer().getScheduler().runTask(this.plugin, () -> sender.sendMessage(afkListCleared));
 
             return new CompletableFuture<>();
         });
@@ -134,8 +171,12 @@ public record AfkCommand(JavaPlugin plugin,
                     pageIndex = 1;
                 }
             } catch (NumberFormatException e) {
-                this.plugin.getServer().getScheduler().runTask(this.plugin,
-                        () -> sender.sendMessage(ChatColor.RED + "You must specify a valid page number!"));
+                TextComponent invalidPageNumber = Component.text()
+                    .color(NamedTextColor.RED)
+                    .append(Component.text("You must specify a valid page number!"))
+                    .build();
+
+                this.plugin.getServer().getScheduler().runTask(this.plugin, () -> sender.sendMessage(invalidPageNumber));
                 return false;
             }
         } else {
@@ -153,16 +194,23 @@ public record AfkCommand(JavaPlugin plugin,
                     int maxPages = result.getMaxPageCount();
 
                     if (playerIds.isEmpty()) {
-                        this.plugin.getServer().getScheduler().runTask(this.plugin,
-                                () -> sender.sendMessage(ChatColor.YELLOW + "There are no results to be shown."));
+                        TextComponent afkExemptListEmpty = Component.text()
+                            .color(NamedTextColor.YELLOW)
+                            .append(Component.text("There are no results to be shown."))
+                            .build();
+
+                        this.plugin.getServer().getScheduler().runTask(this.plugin, () -> sender.sendMessage(afkExemptListEmpty));
                         return;
                     }
 
-                    this.plugin.getServer().getScheduler().runTask(this.plugin,
-                            () -> sender.sendMessage(ChatColor.YELLOW + "AFK Kick Exempt List"));
+                    TextComponent afkListPrompt = Component.text()
+                        .color(NamedTextColor.YELLOW)
+                        .append(Component.text("AFK Kick Exempt List"))
+                        .build();
 
-                    ExemptListChatHelpers exemptListChatHelpers =
-                            new ExemptListChatHelpers(this.plugin, this.mojangApi);
+                    this.plugin.getServer().getScheduler().runTask(this.plugin, () -> sender.sendMessage(afkListPrompt));
+
+                    ExemptListChatHelpers exemptListChatHelpers = new ExemptListChatHelpers(this.plugin, this.mojangApi);
                     Component baseMessage = exemptListChatHelpers.buildPaginationMessage(finalPageIndex,
                             maxPages, "/afk exempt list", playerIds);
 
@@ -170,11 +218,16 @@ public record AfkCommand(JavaPlugin plugin,
                             () -> sender.sendMessage(baseMessage));
 
                     if (!(sender instanceof Player) && finalPageIndex != maxPages) {
-                        this.plugin.getServer().getScheduler().runTask(this.plugin,
-                                () -> sender.sendMessage(
-                                        ChatColor.YELLOW + "To fetch the next page you need to use [" +
-                                        ChatColor.GREEN + "/afk exempt list " + (finalPageIndex + 1) +
-                                        ChatColor.YELLOW + "]"));
+                        TextComponent afkText = Component.text()
+                            .color(NamedTextColor.YELLOW)
+                            .append(Component.text("To fetch the next page you need to use ["))
+                            .color(NamedTextColor.GREEN)
+                            .append(Component.text("/afk exempt list " + (finalPageIndex + 1)))
+                            .color(NamedTextColor.YELLOW)
+                            .append(Component.text("]"))
+                            .build();
+
+                        this.plugin.getServer().getScheduler().runTask(this.plugin, () -> sender.sendMessage(afkText));
                     }
                 });
 

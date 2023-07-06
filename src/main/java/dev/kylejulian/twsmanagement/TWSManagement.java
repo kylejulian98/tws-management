@@ -19,7 +19,7 @@ import dev.kylejulian.twsmanagement.player.PlayerListener;
 import dev.kylejulian.twsmanagement.player.hud.HudListener;
 import dev.kylejulian.twsmanagement.server.whitelist.WhitelistRunnable;
 import dev.kylejulian.twsmanagement.world.PlayerEventsListener;
-import org.apache.commons.lang.time.StopWatch;
+import org.apache.commons.lang3.time.StopWatch;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 

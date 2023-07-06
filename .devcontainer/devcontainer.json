@@ -2,36 +2,33 @@
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.208.0/containers/java
 {
 	"name": "Java",
+
 	"build": {
 		"dockerfile": "Dockerfile",
 		"args": {
-			// Update the VARIANT arg to pick a Java version: 11, 17
-			// Append -bullseye or -buster to pin to an OS version.
-			// Use the -bullseye variants on local arm64/Apple Silicon.
-			"VARIANT": "17-buster",
-			// Options
+			"VARIANT": "17-bullseye",
 			"INSTALL_MAVEN": "false",
 			"INSTALL_GRADLE": "true",
 			"NODE_VERSION": "lts/*"
 		}
 	},
 
-	// Set *default* container specific settings.json values on container create.
-	"settings": { 
-		"java.home": "/docker-java-home",
-		"java.configuration.runtimes": [
-			{
-				"name": "JavaSE-17",
-				"default": true,
-				"path": "/docker-java-home"
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"vscjava.vscode-java-pack"
+			],
+			"settings": {
+				"java.configuration.runtimes": [
+					{
+						"name": "JavaSE-17",
+						"default": true,
+						"path": "/docker-java-home"
+					}
+				]
 			}
-		]
+		}
 	},
-	
-	// Add the IDs of extensions you want installed when the container is created.
-	"extensions": [
-		"vscjava.vscode-java-pack"
-	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],

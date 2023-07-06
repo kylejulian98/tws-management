@@ -2,6 +2,7 @@ package dev.kylejulian.twsmanagement.extensions;
 
 import dev.kylejulian.twsmanagement.data.MojangApi;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.ClickEvent.Action;
@@ -16,9 +17,9 @@ import java.util.concurrent.ExecutionException;
 
 public class ExemptListChatHelpers {
 
-    private final TextColor red = TextColor.color(255, 0, 0);
-    private final TextColor yellow = TextColor.color(251, 251, 84);
-    private final TextColor green = TextColor.color(0, 255, 0);
+    private final TextColor red = NamedTextColor.RED;
+    private final TextColor yellow = NamedTextColor.YELLOW;
+    private final TextColor green = NamedTextColor.GREEN;
 
     private final JavaPlugin plugin;
     private final MojangApi mojangApi;
