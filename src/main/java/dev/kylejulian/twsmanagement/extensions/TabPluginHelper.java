@@ -25,7 +25,7 @@ public class TabPluginHelper {
 
 		MiniMessage mm = MiniMessage.miniMessage();
 		String suffixText =  mm.serialize(suffix);
-
+		// Revisit
 		tablistFormatManager.setSuffix(player, " &8[&cAFK&8]");
 	}
 
