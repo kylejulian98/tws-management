@@ -22,5 +22,5 @@ jobs:
     - name: Build with Gradle
       uses: gradle/gradle-build-action@v2.5.1
       with:
-        gradle-version: 8.2.0
+        gradle-version: 8.2
         arguments: build
