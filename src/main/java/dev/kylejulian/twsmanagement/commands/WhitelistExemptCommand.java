@@ -6,7 +6,8 @@ import dev.kylejulian.twsmanagement.data.entities.EntityExemptList;
 import dev.kylejulian.twsmanagement.data.interfaces.IExemptDatabaseManager;
 import dev.kylejulian.twsmanagement.extensions.ExemptListChatHelpers;
 import net.kyori.adventure.text.Component;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -36,7 +37,12 @@ public record WhitelistExemptCommand(JavaPlugin plugin,
                              @NotNull String label,
                              String[] args) {
         if (args.length < 1) {
-            sender.sendMessage(ChatColor.RED + "You need to specify a command add/remove/list");
+            TextComponent mustSpecifyValidCommand = Component.text()
+                .color(NamedTextColor.RED)
+                .append(Component.text("You need to specify a command add/remove/list"))
+                .build();
+
+            sender.sendMessage(mustSpecifyValidCommand);
             return true;
         }
 
@@ -51,7 +57,12 @@ public record WhitelistExemptCommand(JavaPlugin plugin,
                         pageIndex = 1;
                     }
                 } catch (NumberFormatException e) {
-                    sender.sendMessage(ChatColor.RED + "You must specify a valid page number!");
+                    TextComponent mustSpecifyValidPageNumber = Component.text()
+                        .color(NamedTextColor.RED)
+                        .append(Component.text("You must specify a valid page number!"))
+                        .build();
+
+                    sender.sendMessage(mustSpecifyValidPageNumber);
                     return false;
                 }
             } else {
@@ -69,11 +80,21 @@ public record WhitelistExemptCommand(JavaPlugin plugin,
                 int maxPages = result.getMaxPageCount();
 
                 if (playerIds.isEmpty()) {
-                    sender.sendMessage(ChatColor.YELLOW + "There are no results to be shown.");
+                    TextComponent noResultsToShow = Component.text()
+                        .color(NamedTextColor.YELLOW)
+                        .append(Component.text("There are no results to be shown."))
+                        .build();
+                    
+                    sender.sendMessage(noResultsToShow);
                     return;
                 }
+                
+                TextComponent listPrompt = Component.text()
+                    .color(NamedTextColor.YELLOW)
+                    .append(Component.text("Auto Unwhitelist Exempt List"))
+                    .build();
 
-                sender.sendMessage(ChatColor.YELLOW + "Auto Unwhitelist Exempt List");
+                sender.sendMessage(listPrompt);
                 ExemptListChatHelpers exemptListChatHelpers = new ExemptListChatHelpers(this.plugin, this.mojangApi);
 
                 Component baseMessage = exemptListChatHelpers.buildPaginationMessage(finalPageIndex, maxPages,
@@ -81,26 +102,48 @@ public record WhitelistExemptCommand(JavaPlugin plugin,
                 sender.sendMessage(baseMessage);
 
                 if (!(sender instanceof Player) && finalPageIndex != maxPages) {
-                    sender.sendMessage(ChatColor.YELLOW + "To fetch the next page you need to use [" +
-                            ChatColor.GREEN + "/exe list " + (finalPageIndex + 1) + ChatColor.YELLOW + "]");
+                    TextComponent fetchNextPagePrompt = Component.text()
+                        .color(NamedTextColor.YELLOW)
+                        .append(Component.text("To fetch the next page you need to use ["))
+                        .color(NamedTextColor.GREEN)
+                        .append(Component.text("/exe list " + (finalPageIndex + 1)))
+                        .color(NamedTextColor.YELLOW)
+                        .append(Component.text("To fetch the next page you need to use ]"))
+                        .build();
+
+                    sender.sendMessage(fetchNextPagePrompt);
                 }
             });
         } else if (command.equalsIgnoreCase("clear")) {
             CompletableFuture<Void> clearFuture = this.whitelistExemptDatabaseManager.clear();
             clearFuture.thenComposeAsync(i -> {
-                this.plugin.getServer().getScheduler().runTask(this.plugin,
-                        () -> sender.sendMessage(ChatColor.YELLOW + "Auto unwhitelist exempt list cleared"));
+                TextComponent exemptListCleared = Component.text()
+                    .color(NamedTextColor.YELLOW)
+                    .append(Component.text("Auto unwhitelist exempt list cleared"))
+                    .build();
+
+                this.plugin.getServer().getScheduler().runTask(this.plugin, () -> sender.sendMessage(exemptListCleared));
 
                 return new CompletableFuture<>();
             });
         } else {
             if (args.length < 2) {
-                sender.sendMessage(ChatColor.RED + "You must specify a player");
+                TextComponent mustSpecifyPlayer = Component.text()
+                    .color(NamedTextColor.RED)
+                    .append(Component.text("You must specify a player"))
+                    .build();
+
+                sender.sendMessage(mustSpecifyPlayer);
                 return true;
             }
 
             if (!sender.isOp() && !sender.hasPermission("tws.exempt")) {
-                sender.sendMessage(ChatColor.RED + "You do not have permission to use this command");
+                TextComponent youDoNotHavePermissions = Component.text()
+                    .color(NamedTextColor.RED)
+                    .append(Component.text("You do not have permission to use this command"))
+                    .build();
+
+                sender.sendMessage(youDoNotHavePermissions);
                 return true;
             }
 
@@ -114,28 +157,48 @@ public record WhitelistExemptCommand(JavaPlugin plugin,
                         if (whitelistExemptFutureModel.getIsExempt()) {
                             // Exempt
                             if (command.equalsIgnoreCase("add")) {
-                                this.plugin.getServer().getScheduler().runTask(this.plugin,
-                                        () -> sender.sendMessage(ChatColor.RED + target +
-                                                " is already auto unwhitelist exempt"));
+                                TextComponent isAlreadyExempt = Component.text()
+                                    .color(NamedTextColor.RED)
+                                    .append(Component.text(target))
+                                    .appendSpace()
+                                    .append(Component.text("is already auto unwhitelist exempt"))
+                                    .build();
+
+                                this.plugin.getServer().getScheduler().runTask(this.plugin, () -> sender.sendMessage(isAlreadyExempt));
                                 return new CompletableFuture<>();
                             }
 
-                            this.plugin.getServer().getScheduler().runTask(this.plugin,
-                                    () -> sender.sendMessage(ChatColor.GREEN + target +
-                                            " was removed from the auto unwhitelist exempt list"));
+                            TextComponent playerWasRemoved = Component.text()
+                                .color(NamedTextColor.GREEN)
+                                .append(Component.text(target))
+                                .appendSpace()
+                                .append(Component.text("was removed from the auto unwhitelist exempt list"))
+                                .build();
+
+                            this.plugin.getServer().getScheduler().runTask(this.plugin, () -> sender.sendMessage(playerWasRemoved));
                             return whitelistExemptDatabaseManager.remove(whitelistExemptFutureModel.getPlayerId());
                         } else {
                             // Not exempt
                             if (command.equalsIgnoreCase("add")) {
-                                this.plugin.getServer().getScheduler().runTask(this.plugin,
-                                        () -> sender.sendMessage(ChatColor.GREEN + target +
-                                                " was added to auto unwhitelist exempt list"));
+                                TextComponent playerWasAdded = Component.text()
+                                    .color(NamedTextColor.GREEN)
+                                    .append(Component.text(target))
+                                    .appendSpace()
+                                    .append(Component.text("was added to auto unwhitelist exempt list"))
+                                    .build();
+
+                                this.plugin.getServer().getScheduler().runTask(this.plugin, () -> sender.sendMessage(playerWasAdded));
                                 return whitelistExemptDatabaseManager.add(whitelistExemptFutureModel.getPlayerId());
                             }
 
-                            this.plugin.getServer().getScheduler().runTask(this.plugin,
-                                    () -> sender.sendMessage(ChatColor.RED + target +
-                                            " is not auto unwhitelist exempt"));
+                            TextComponent playerIsNotExempt = Component.text()
+                                .color(NamedTextColor.RED)
+                                .append(Component.text(target))
+                                .appendSpace()
+                                .append(Component.text("is not auto unwhitelist exempt"))
+                                .build();
+
+                            this.plugin.getServer().getScheduler().runTask(this.plugin, () -> sender.sendMessage(playerIsNotExempt));
                             return new CompletableFuture<>();
                         }
                     });

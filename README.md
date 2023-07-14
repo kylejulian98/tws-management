@@ -41,7 +41,7 @@ This plugin maintains a local SQLite database which persists information used by
 
 ### Running the Plugin
 
-This plugin runs on Minecraft [Purpur 1.18.1](https://purpurmc.org/docs/). You can download the latest version of the plugin jar through navigating the Packages section of this github repository, or using the following link [packages](https://github.com/kylejulian98/tws.management/packages).
+This plugin runs on Minecraft [Purpur 1.20.1](https://purpurmc.org/docs/). You can download the latest version of the plugin jar through navigating the Packages section of this github repository, or using the following link [packages](https://github.com/kylejulian98/tws.management/packages).
 
 #### Requirements
 

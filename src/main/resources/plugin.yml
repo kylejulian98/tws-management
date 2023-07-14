@@ -4,7 +4,7 @@ version: "${PLUGINVERSION}"
 author: JuHDude
 prefix: TWSManagement
 description: Bespoke plugin used to provide management functionalities for the tws.gg Minecraft Server
-api-version: "1.18"
+api-version: "1.20"
 database: true
 depend:
 - TAB

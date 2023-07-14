@@ -12,7 +12,11 @@ import dev.kylejulian.twsmanagement.afk.events.AfkCancelledEvent;
 import dev.kylejulian.twsmanagement.afk.events.AfkEvent;
 import dev.kylejulian.twsmanagement.configuration.AfkConfigModel;
 import dev.kylejulian.twsmanagement.extensions.TabPluginHelper;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -27,6 +31,17 @@ import dev.kylejulian.twsmanagement.configuration.ConfigurationManager;
 import org.jetbrains.annotations.NotNull;
 
 public class PlayerListener implements Listener {
+
+	final TextComponent afkText = Component.text()
+		.color(NamedTextColor.GRAY)
+		.appendSpace()
+		.append(Component.text("["))
+		.color(NamedTextColor.RED)
+		.append(Component.text("AFK"))
+		.color(NamedTextColor.GRAY)
+		.append(Component.text("]"))
+		.style(Style.empty())
+		.build();
 
 	private final JavaPlugin plugin;
 	private final IExemptDatabaseManager afkDatabaseManager;
@@ -85,7 +100,7 @@ public class PlayerListener implements Listener {
 
 		// Only reset the Tab if they were actually AFK
 		if (TabPluginHelper.hasTabSuffix(playerId)) {
-			Runnable tabTask = () -> TabPluginHelper.setTabSuffix(playerId, ChatColor.RESET + "");
+			Runnable tabTask = () -> TabPluginHelper.resetTabSuffix(playerId);
 			this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, tabTask);
 		}
 
@@ -117,6 +132,8 @@ public class PlayerListener implements Listener {
 	
 	@EventHandler
 	public void onAfk(@NotNull AfkEvent e) {
+		
+
 		UUID playerId = e.getPlayerId();
 
 		if (!TabPluginHelper.hasTabSuffix(playerId)) {
@@ -124,13 +141,16 @@ public class PlayerListener implements Listener {
 			if (player != null) {
 				AfkConfigModel afkConfig = configManager.getConfig().getAfkConfig();
 				if (afkConfig.getSendPlayerAfkMessage()) {
-					player.sendMessage(ChatColor.DARK_RED + "You are now AFK");
+					TextComponent youAreAfk = Component.text()
+						.color(NamedTextColor.DARK_RED)
+						.append(Component.text("You are now AFK"))
+						.build();
+
+					player.sendMessage(youAreAfk);
 				}
 
-				Runnable tabTask = () -> TabPluginHelper.setTabSuffix(playerId, 
-					ChatColor.GRAY + "[" + ChatColor.RED + "AFK" + ChatColor.GRAY + "] " + ChatColor.RESET);
-				
-					this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, tabTask);
+				Runnable tabTask = () -> TabPluginHelper.setTabSuffix(playerId, afkText);
+				this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, tabTask);
 			}
 		}
 	}

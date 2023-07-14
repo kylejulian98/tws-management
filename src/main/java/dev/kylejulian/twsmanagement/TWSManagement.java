@@ -18,8 +18,7 @@ import dev.kylejulian.twsmanagement.data.sqlite.WhitelistDatabaseManager;
 import dev.kylejulian.twsmanagement.player.PlayerListener;
 import dev.kylejulian.twsmanagement.player.hud.HudListener;
 import dev.kylejulian.twsmanagement.server.whitelist.WhitelistRunnable;
-import dev.kylejulian.twsmanagement.world.PlayerEventsListener;
-import org.apache.commons.lang.time.StopWatch;
+import org.apache.commons.lang3.time.StopWatch;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -57,26 +56,17 @@ public class TWSManagement extends JavaPlugin {
 			return;
 		}
 
-		this.databaseConnectionManager = new DatabaseConnectionManager(databaseConfig,
-				this.getDataFolder().getAbsolutePath());
-		IExemptDatabaseManager afkDatabaseManager = new AfkDatabaseManager(this,
-				this.databaseConnectionManager);
-		IExemptDatabaseManager whitelistExemptDatabaseManager = new WhitelistDatabaseManager(this,
-				this.databaseConnectionManager);
-		IHudDatabaseManager hudDatabaseManager = new HudDatabaseManager(this,
-				this.databaseConnectionManager);
+		this.databaseConnectionManager = new DatabaseConnectionManager(databaseConfig, this.getDataFolder().getAbsolutePath());
+		IExemptDatabaseManager afkDatabaseManager = new AfkDatabaseManager(this, this.databaseConnectionManager);
+		IExemptDatabaseManager whitelistExemptDatabaseManager = new WhitelistDatabaseManager(this, this.databaseConnectionManager);
+		IHudDatabaseManager hudDatabaseManager = new HudDatabaseManager(this, this.databaseConnectionManager);
 
 		this.getLogger().log(Level.INFO, "Internal dependencies have been created by {0}ms", stopWatch.getTime());
 
-		runDefaultSchemaSetup(new IDatabaseManager[] {afkDatabaseManager, hudDatabaseManager,
-				whitelistExemptDatabaseManager }, stopWatch);
+		runDefaultSchemaSetup(new IDatabaseManager[] {afkDatabaseManager, hudDatabaseManager, whitelistExemptDatabaseManager }, stopWatch);
 
-		this.getServer().getPluginManager().registerEvents(new PlayerListener(this, afkDatabaseManager,
-				hudDatabaseManager, this.configManager), this);
-		this.getServer().getPluginManager().registerEvents(new AfkEventListener(this, afkConfig),
-				this);
-		this.getServer().getPluginManager().registerEvents(new PlayerEventsListener(this, nightResetConfig),
-				this);
+		this.getServer().getPluginManager().registerEvents(new PlayerListener(this, afkDatabaseManager, hudDatabaseManager, this.configManager), this);
+		this.getServer().getPluginManager().registerEvents(new AfkEventListener(this, afkConfig), this);
 		this.getServer().getPluginManager().registerEvents(new HudListener(this, hudConfig), this);
 
 		this.getLogger().log(Level.INFO, "Plugin Events have been registered by {0}ms", stopWatch.getTime());
